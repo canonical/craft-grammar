@@ -16,6 +16,8 @@
 
 """Errors for Craft Grammar."""
 
+from typing import Optional
+
 
 class CraftGrammarError(Exception):
     """Base class error for craft-grammar."""
@@ -31,7 +33,7 @@ class GrammarSyntaxError(CraftGrammarError):
 class OnStatementSyntaxError(GrammarSyntaxError):
     """Error raised on on statement syntax errors."""
 
-    def __init__(self, on_statement, *, message=None):
+    def __init__(self, on_statement: str, *, message: Optional[str] = None):
         components = [f"{on_statement!r} is not a valid 'on' clause"]
         if message:
             components.append(message)
@@ -41,7 +43,7 @@ class OnStatementSyntaxError(GrammarSyntaxError):
 class ToStatementSyntaxError(GrammarSyntaxError):
     """Error raised on to statement syntax errors."""
 
-    def __init__(self, to_statement, *, message=None):
+    def __init__(self, to_statement: str, *, message: Optional[str] = None):
         components = [f"{to_statement!r} is not a valid 'to' clause"]
         if message:
             components.append(message)
@@ -51,5 +53,5 @@ class ToStatementSyntaxError(GrammarSyntaxError):
 class UnsatisfiedStatementError(CraftGrammarError):
     """Error raised when a statement cannot be satisfied."""
 
-    def __init__(self, statement):
+    def __init__(self, statement: str):
         super().__init__(f"Unable to satisfy {statement!r}, failure forced.")
