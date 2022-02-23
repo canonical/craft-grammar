@@ -40,6 +40,7 @@ limit-inference-results=100
 # List of plugins (as comma separated values of python module names) to load,
 # usually to register additional checkers.
 load-plugins=pylint_fixme_info,
+             pylint_pydantic,
              pylint_pytest
 
 # Pickle collected data for later comparisons.
@@ -151,6 +152,7 @@ disable=print-statement,
         line-too-long,
         fixme,
         fixme-info,
+        too-few-public-methods,
         duplicate-code
 
 # Enable the message, report, category or checker with the given id(s). You can

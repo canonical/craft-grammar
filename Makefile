@@ -95,7 +95,7 @@ test-pydocstyle:
 .PHONY: test-pylint
 test-pylint:
 	pylint craft_grammar
-	pylint tests --disable=missing-module-docstring,missing-function-docstring,redefined-outer-name
+	pylint tests --disable=invalid-name,missing-module-docstring,missing-function-docstring,redefined-outer-name
 
 .PHONY: test-pyright
 test-pyright:
