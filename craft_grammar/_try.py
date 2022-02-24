@@ -16,7 +16,7 @@
 
 """Try Statement for Craft Grammar."""
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from overrides import overrides
 
@@ -48,7 +48,7 @@ class TryStatement(Statement):
         *,
         body: Grammar,
         processor: "GrammarProcessor",
-        call_stack: CallStack = None
+        call_stack: Optional[CallStack] = None
     ) -> None:
         """Create a TryStatement instance.
 
