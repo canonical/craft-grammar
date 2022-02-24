@@ -17,7 +17,7 @@
 """On Statement for Craft Grammar."""
 
 import re
-from typing import TYPE_CHECKING, Set
+from typing import TYPE_CHECKING, Optional, Set
 
 from overrides import overrides
 
@@ -40,7 +40,7 @@ class OnStatement(Statement):
         on_statement: str,
         body: Grammar,
         processor: "GrammarProcessor",
-        call_stack: CallStack = None,
+        call_stack: Optional[CallStack] = None,
     ) -> None:
         """Create an OnStatement instance.
 

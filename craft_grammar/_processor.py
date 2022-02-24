@@ -43,7 +43,7 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
         checker: Callable[[Any], bool],
         arch: str,
         target_arch: str,
-        transformer: Callable[[List[Statement], str, str], str] = None,
+        transformer: Optional[Callable[[List[Statement], str, str], str]] = None,
     ) -> None:
         """Create a new GrammarProcessor.
 
@@ -65,7 +65,9 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
             # By default, no transformation
             self._transformer = lambda s, p, o: p
 
-    def process(self, *, grammar: Grammar, call_stack: CallStack = None) -> List[Any]:
+    def process(
+        self, *, grammar: Grammar, call_stack: Optional[CallStack] = None
+    ) -> List[Any]:
         """Process grammar and extract desired primitives.
 
         :param grammar: Unprocessed grammar.
