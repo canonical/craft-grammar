@@ -70,7 +70,7 @@ def test_validate_grammar_simple():
               on amd64: another string
               else: something different
             grammar_strlist:
-              to amd64, arm64:
+              to amd64,arm64:
                 - a
                 - string
                 - list
@@ -108,7 +108,7 @@ def test_validate_grammar_recursive():
               else:
                 to arm64: this other thing
             grammar_strlist:
-              to amd64, arm64:
+              to amd64,arm64:
                 on riscv64:
                   - a
                   - string
@@ -123,7 +123,7 @@ def test_validate_grammar_recursive():
                 - other
                 - stuff
             grammar_single_entry_dictlist:
-              on arch, other_arch:
+              on arch,other_arch:
                  on other_arch:
                     to yet_another_arch:
                        - key: value
@@ -234,7 +234,7 @@ def test_grammar_nested_error():
     with pytest.raises(pydantic.ValidationError) as raised:
         GrammarValidation(
             x={
-                "on arm64, amd64": {"on arm64": "foo", "else": 35},
+                "on arm64,amd64": {"on arm64": "foo", "else": 35},
                 "else": "baz",
             }  # type: ignore
         )
@@ -291,3 +291,46 @@ def test_grammar_extras():
     assert err[0]["loc"] == ("x",)
     assert err[0]["type"] == "value_error"
     assert err[0]["msg"] == "invalid grammar key 'foo'"
+
+
+@pytest.mark.parametrize(
+    "clause,err_msg",
+    [
+        ("on", "invalid grammar key 'on'"),
+        ("on ,", "syntax error in 'on' selector"),
+        ("on ,arch", "syntax error in 'on' selector"),
+        ("on arch,", "syntax error in 'on' selector"),
+        ("on arch,,arch", "syntax error in 'on' selector"),
+        ("on arch, arch", "spaces are not allowed in 'on' selector"),
+        ("to", "invalid grammar key 'to'"),
+        ("to ,", "syntax error in 'to' selector"),
+        ("to ,arch", "syntax error in 'to' selector"),
+        ("to arch,", "syntax error in 'to' selector"),
+        ("to arch,,arch", "syntax error in 'to' selector"),
+        ("to arch, arch", "spaces are not allowed in 'to' selector"),
+        ("on , to b", "syntax error in 'on ... to' selector"),
+        ("on ,a to b", "syntax error in 'on ... to' selector"),
+        ("on a, to b", "syntax error in 'on ... to' selector"),
+        ("on a,,a to b", "syntax error in 'on ... to' selector"),
+        ("on a to ,", "syntax error in 'on ... to' selector"),
+        ("on a to ,b", "syntax error in 'on ... to' selector"),
+        ("on a to b,", "syntax error in 'on ... to' selector"),
+        ("on a to b,,b", "syntax error in 'on ... to' selector"),
+        ("on a, a to b", "spaces are not allowed in 'on ... to' selector"),
+        ("on a to b, b", "spaces are not allowed in 'on ... to' selector"),
+    ],
+)
+def test_grammar_errors(clause, err_msg):
+    class GrammarValidation(pydantic.BaseModel):
+        """Test validation of grammar-enabled types."""
+
+        x: GrammarStr
+
+    with pytest.raises(pydantic.ValidationError) as raised:
+        GrammarValidation(x={clause: "foo"})  # type: ignore
+
+    err = raised.value.errors()
+    assert len(err) == 1
+    assert err[0]["loc"] == ("x",)
+    assert err[0]["type"] == "value_error"
+    assert err[0]["msg"] == err_msg

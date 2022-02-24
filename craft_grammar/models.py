@@ -21,6 +21,10 @@ from typing import Any, Dict, List, Union
 
 from overrides import overrides
 
+_on_pattern = re.compile(r"^on\s+(.+)\s*$")
+_to_pattern = re.compile(r"^to\s+(.+)\s*$")
+_compound_pattern = re.compile(r"^on\s+(.+)\s+to\s+(.+)\s*$")
+
 
 class _GrammarBase:
     @classmethod
@@ -41,20 +45,53 @@ class _GrammarBase:
                     "'try' was removed from grammar, use 'on <arch>' instead"
                 )
 
-            if re.match(r"^on\s+.+", key):
-                new_entry["on"] = cls.validate(value)
-            elif re.match(r"^to\s+.+", key):
-                new_entry["to"] = cls.validate(value)
-            elif key == "else fail":
+            # 'else fail' clause
+            if key == "else fail":
                 if value:
                     raise ValueError("'else fail' must have no arguments")
                 new_entry[key] = None
-            elif key == "else":
+                continue
+
+            # 'else' clause
+            if key == "else":
                 new_entry[key] = cls.validate(value)
-            else:
-                raise ValueError(f"invalid grammar key {key!r}")
+                continue
+
+            # 'on ... to' clause
+            res = _compound_pattern.match(key)
+            if res:
+                _ensure_selector_valid(res.group(1), clause="on ... to")
+                _ensure_selector_valid(res.group(2), clause="on ... to")
+                new_entry["to"] = cls.validate(value)
+                continue
+
+            # 'on' clause
+            res = _on_pattern.match(key)
+            if res:
+                _ensure_selector_valid(res.group(1), clause="on")
+                new_entry["on"] = cls.validate(value)
+                continue
+
+            # 'to' clause
+            res = _to_pattern.match(key)
+            if res:
+                _ensure_selector_valid(res.group(1), clause="to")
+                new_entry["to"] = cls.validate(value)
+                continue
+
+            raise ValueError(f"invalid grammar key {key!r}")
 
         return new_entry
+
+
+def _ensure_selector_valid(selector: str, *, clause: str) -> None:
+    # spaces are not allowed in selector
+    if " " in selector:
+        raise ValueError(f"spaces are not allowed in {clause!r} selector")
+
+    # selector items should be separated by comma
+    if selector.startswith(",") or selector.endswith(",") or ",," in selector:
+        raise ValueError(f"syntax error in {clause!r} selector")
 
 
 _GrammarType = Dict[str, Any]
