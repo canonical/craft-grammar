@@ -16,6 +16,7 @@
 
 """Pydantic models for grammar."""
 
+import abc
 import re
 from typing import Any, Dict, List, Union
 
@@ -25,73 +26,28 @@ _on_pattern = re.compile(r"^on\s+(.+)\s*$")
 _to_pattern = re.compile(r"^to\s+(.+)\s*$")
 _compound_pattern = re.compile(r"^on\s+(.+)\s+to\s+(.+)\s*$")
 
+_ELSE_FAIL = "else fail"
+_ELSE = "else"
+_TRY = "try"
 
-class _GrammarBase:
+
+class _GrammarBase(abc.ABC):
     @classmethod
     def __get_validators__(cls):
         yield cls.validate
 
     @classmethod
+    @abc.abstractmethod
     def validate(cls, entry):
-        """Transform 'on' and 'to' field names."""
-        if not isinstance(entry, dict):
-            return entry
+        """Ensure the given entry is valid type or grammar."""
 
-        new_entry = {}
-        for key, value in entry.items():
-            # Do, or do not. There is no try.
-            if key == "try":
-                raise ValueError(
-                    "'try' was removed from grammar, use 'on <arch>' instead"
-                )
-
-            # 'else fail' clause
-            if key == "else fail":
-                if value:
-                    raise ValueError("'else fail' must have no arguments")
-                new_entry[key] = None
-                continue
-
-            # 'else' clause
-            if key == "else":
-                new_entry[key] = cls.validate(value)
-                continue
-
-            # 'on ... to' clause
-            res = _compound_pattern.match(key)
-            if res:
-                _ensure_selector_valid(res.group(1), clause="on ... to")
-                _ensure_selector_valid(res.group(2), clause="on ... to")
-                new_entry["to"] = cls.validate(value)
-                continue
-
-            # 'on' clause
-            res = _on_pattern.match(key)
-            if res:
-                _ensure_selector_valid(res.group(1), clause="on")
-                new_entry["on"] = cls.validate(value)
-                continue
-
-            # 'to' clause
-            res = _to_pattern.match(key)
-            if res:
-                _ensure_selector_valid(res.group(1), clause="to")
-                new_entry["to"] = cls.validate(value)
-                continue
-
-            raise ValueError(f"invalid grammar key {key!r}")
-
-        return new_entry
-
-
-def _ensure_selector_valid(selector: str, *, clause: str) -> None:
-    # spaces are not allowed in selector
-    if " " in selector:
-        raise ValueError(f"spaces are not allowed in {clause!r} selector")
-
-    # selector items should be separated by comma
-    if selector.startswith(",") or selector.endswith(",") or ",," in selector:
-        raise ValueError(f"syntax error in {clause!r} selector")
+    @classmethod
+    def _grammar_append(cls, entry: List, item: Any) -> None:
+        if item == _ELSE_FAIL:
+            _mark_and_append(entry, item)
+        else:
+            key, value = tuple(item.items())[0]
+            _mark_and_append(entry, {key: cls.validate(value)})
 
 
 _GrammarType = Dict[str, Any]
@@ -108,8 +64,15 @@ class GrammarStr(_GrammarBase):
     @classmethod
     @overrides
     def validate(cls, entry):
-        if isinstance(entry, dict):
-            return super().validate(entry)
+        # GrammarStr entry can be a list if it contains clauses
+        if isinstance(entry, list):
+            new_entry = []
+            for item in entry:
+                if _is_grammar_clause(item):
+                    cls._grammar_append(new_entry, item)
+                else:
+                    raise TypeError(f"value must be a string: {entry!r}")
+            return new_entry
 
         if isinstance(entry, str):
             return entry
@@ -120,16 +83,22 @@ class GrammarStr(_GrammarBase):
 class GrammarStrList(_GrammarBase):
     """Grammar-enabled list of strings field."""
 
-    __root__: Union[List[str], _GrammarType]
+    __root__: Union[List[Union[str, _GrammarType]], _GrammarType]
 
     @classmethod
     @overrides
     def validate(cls, entry):
-        if isinstance(entry, dict):
-            return super().validate(entry)
-
-        if isinstance(entry, list) and all((isinstance(x, str) for x in entry)):
-            return entry
+        # GrammarStrList will always be a list
+        if isinstance(entry, list):
+            new_entry = []
+            for item in entry:
+                if _is_grammar_clause(item):
+                    cls._grammar_append(new_entry, item)
+                elif isinstance(item, str):
+                    new_entry.append(item)
+                else:
+                    raise TypeError(f"value must be a list of string: {entry!r}")
+            return new_entry
 
         raise TypeError(f"value must be a list of string: {entry!r}")
 
@@ -142,12 +111,79 @@ class GrammarSingleEntryDictList(_GrammarBase):
     @classmethod
     @overrides
     def validate(cls, entry):
-        if isinstance(entry, dict):
-            return super().validate(entry)
-
-        if isinstance(entry, list) and all(
-            ((isinstance(x, dict) and len(x) == 1) for x in entry)
-        ):
-            return entry
+        # GrammarSingleEntryDictList will always be a list
+        if isinstance(entry, list):
+            new_entry = []
+            for item in entry:
+                if _is_grammar_clause(item):
+                    cls._grammar_append(new_entry, item)
+                elif isinstance(item, dict) and len(item) == 1:
+                    new_entry.append(item)
+                else:
+                    raise TypeError(
+                        f"value must be a list of single-entry dictionaries: {entry!r}"
+                    )
+            return new_entry
 
         raise TypeError(f"value must be a list of single-entry dictionaries: {entry!r}")
+
+
+def _ensure_selector_valid(selector: str, *, clause: str) -> None:
+    """Verify selector syntax."""
+    # spaces are not allowed in selector
+    if " " in selector:
+        raise ValueError(f"spaces are not allowed in {clause!r} selector")
+
+    # selector items should be separated by comma
+    if selector.startswith(",") or selector.endswith(",") or ",," in selector:
+        raise ValueError(f"syntax error in {clause!r} selector")
+
+
+def _is_grammar_clause(item: Any) -> bool:  # pylint: disable=too-many-return-statements
+    """Check if the given item is a valid grammar clause."""
+    # The 'else fail' clause is a string.
+    if item == _ELSE_FAIL:
+        return True
+
+    # Other grammar clauses are single-entry dictionaries.
+    if not isinstance(item, dict) or len(item) != 1:
+        return False
+
+    key = tuple(item.keys())[0]
+
+    if not isinstance(key, str):
+        return False
+
+    # Do, or do not. There is no try.
+    if key == _TRY:
+        raise ValueError("'try' was removed from grammar, use 'on <arch>' instead")
+
+    if key == _ELSE:
+        return True
+
+    res = _compound_pattern.match(key)
+    if res:
+        _ensure_selector_valid(res.group(1), clause="on ... to")
+        _ensure_selector_valid(res.group(2), clause="on ... to")
+        return True
+
+    res = _on_pattern.match(key)
+    if res:
+        _ensure_selector_valid(res.group(1), clause="on")
+        return True
+
+    res = _to_pattern.match(key)
+    if res:
+        _ensure_selector_valid(res.group(1), clause="to")
+        return True
+
+    return False
+
+
+def _mark_and_append(entry: List, item: Any) -> None:
+    """Mark entry as parsed for testing and debug."""
+    if isinstance(item, str):
+        entry.append("*" + item)
+    elif isinstance(item, dict):
+        key, value = tuple(item.items())[0]
+        entry.append({f"*{key}": value})
