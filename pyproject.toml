@@ -12,7 +12,6 @@ exclude = [
     "build",
     "docs",
     "results",
-    "tests",
 ]
 warn_unused_configs = true
 warn_redundant_casts = true
