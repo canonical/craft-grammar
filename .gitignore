@@ -107,3 +107,6 @@ ENV/
 # direnv
 .direnv
 .envrc
+
+# ruff
+.ruff_cache
