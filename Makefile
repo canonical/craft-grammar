@@ -58,7 +58,7 @@ install: clean ## Install python package.
 	python setup.py install
 
 .PHONY: lint
-lint: test-black test-codespell test-isort test-mypy test-pydocstyle test-pylint test-pyright ## Run all linting tests.
+lint: test-black test-codespell test-isort test-mypy test-pylint test-pyright ## Run all linting tests.
 
 .PHONY: release
 release: dist ## Release with twine.
@@ -83,10 +83,6 @@ test-isort:
 .PHONY: test-mypy
 test-mypy:
 	mypy craft_grammar tests
-
-.PHONY: test-pydocstyle
-test-pydocstyle:
-	pydocstyle craft_grammar --ignore-decorator=overrides
 
 .PHONY: test-pylint
 test-pylint:
