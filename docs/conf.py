@@ -52,10 +52,18 @@ release = craft_grammar.__version__
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.coverage",
+    "sphinx.ext.doctest",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
     "sphinx_autodoc_typehints",  # must be loaded after napoleon
+    "sphinx_design",
+    "sphinx_copybutton",
     "sphinx-pydantic",
+    "sphinx_toolbox",
+    "sphinx_toolbox.more_autodoc",
+    "sphinx.ext.autodoc",  # Must be loaded after more_autodoc
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -66,21 +74,25 @@ templates_path = ["_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
-
-# -- Options for HTML output -------------------------------------------------
-
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-#
-html_theme = "sphinx_rtd_theme"
-
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
+# region Options for HTML output
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
+html_theme = "furo"
 html_static_path = ["_static"]
+html_css_files = [
+    "css/custom.css",
+]
 
 # Do (not) include module names.
 add_module_names = True
+
+# endregion
+# region Options for extensions
+# Intersphinx extension
+# https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html#configuration
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+}
 
 # sphinx_autodoc_typehints
 set_type_checking_flag = True
@@ -90,6 +102,17 @@ typehints_document_rtype = True
 
 # Enable support for google-style instance attributes.
 napoleon_use_ivar = True
+
+# Type hints configuration
+set_type_checking_flag = True
+typehints_fully_qualified = False
+always_document_param_types = True
+
+# Github config
+github_username = "canonical"
+github_repository = "starcraft-base"
+
+# endregion
 
 
 def run_apidoc(_):
