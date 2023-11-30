@@ -1,6 +1,10 @@
 [project]
 name = "craft-grammar"
+description = "Advanced Grammar for Craft Parts"
 dynamic = ["version", "readme"]
+authors = [
+    { name="Canonical Ltd.", email="snapcraft@lists.snapcraft.io" },
+]
 dependencies = [
     "overrides",
 ]
@@ -16,6 +20,12 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
 ]
 requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "https://github.com/canonical/craft-grammar"
+Documentation = "https://craft-grammar.readthedocs.io/en/latest/"
+Source = "https://github.com/canonical/craft-grammar.git"
+Issues = "https://github.com/canonical/craft-grammar/issues"
 
 [project.optional-dependencies]
 dev = [
@@ -156,6 +166,9 @@ exclude = [
     "docs",
     "results",
 ]
+plugins = [
+    "pydantic.mypy",
+]
 warn_unused_configs = true
 warn_redundant_casts = true
 strict_equality = true
@@ -173,6 +186,22 @@ no_implicit_optional = true
 [[tool.mypy.overrides]]
 module = ["tests.*"]
 strict = false
+
+[[tool.mypy.overrides]]
+module = [
+    "keyring.*",
+    "macaroonbakery.*",
+    "pymacaroons.*",
+    "urllib3.*",
+    "requests_toolbelt",
+]
+ignore_missing_imports = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+warn_untyped_fields = true
 
 [tool.ruff]
 line-length = 88
