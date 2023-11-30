@@ -58,7 +58,7 @@ install: clean ## Install python package.
 	python setup.py install
 
 .PHONY: lint
-lint: test-black test-codespell test-isort test-mypy test-pylint test-pyright ## Run all linting tests.
+lint: test-black test-ruff test-codespell test-isort test-mypy test-pylint test-pyright ## Run all linting tests.
 
 .PHONY: release
 release: dist ## Release with twine.
@@ -83,6 +83,10 @@ test-isort:
 .PHONY: test-mypy
 test-mypy:
 	mypy craft_grammar tests
+
+.PHONY: test-ruff
+test-ruff:
+	tox run -e lint-ruff
 
 .PHONY: test-pylint
 test-pylint:
