@@ -264,6 +264,21 @@ ignore = [
 
     # Ignored due to common usage in current code
     "TRY003",  # Avoid specifying long messages outside the exception class
+
+    # To be enabled in craft-grammar
+    "ANN001",
+    "ANN206",
+    "ANN204",
+    "ANN401",
+    "D102",
+    "SIM110",
+    "ARG005",
+    "ANN202",
+    "ANN205",
+    "FIX002",
+    "SIM108",
+    "PLR0911",
+    "PLW2901",
 ]
 
 [tool.ruff.flake8-annotations]
@@ -287,6 +302,12 @@ classmethod-decorators = ["pydantic.validator", "pydantic.root_validator"]
     "PLR0913",  # Allow many arguments for test functions (useful if we need many fixtures)
     "PLR2004",  # Allow magic values in tests
     "SLF",  # Allow accessing private members from tests.
+
+    # To be enabled in craft-grammar tests
+    "PGH003",
+    "PT012",
+    "PT006",
+    "SIM102",
 ]
 "__init__.py" = [
     "I001",  # isort leaves init files alone by default, this makes ruff ignore them too.
