@@ -66,7 +66,10 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
             self._transformer = lambda s, p, o: p
 
     def process(
-        self, *, grammar: Grammar, call_stack: Optional[CallStack] = None
+        self,
+        *,
+        grammar: Grammar,
+        call_stack: Optional[CallStack] = None,
     ) -> List[Any]:
         """Process grammar and extract desired primitives.
 
@@ -124,7 +127,7 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
                 # jsonschema should never let us get here.
                 raise GrammarSyntaxError(
                     "expected grammar section to be either of type 'str' or "
-                    f"type 'dict', but got {type(section)!r}"
+                    f"type 'dict', but got {type(section)!r}",
                 )
 
         # Process the final statement (if any).
@@ -233,7 +236,9 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
                 finalized_statement = statement
 
                 statement = TryStatement(
-                    body=value, processor=self, call_stack=call_stack
+                    body=value,
+                    processor=self,
+                    call_stack=call_stack,
                 )
 
             elif _ELSE_CLAUSE_PATTERN.match(key):
@@ -261,7 +266,7 @@ def _handle_else(statement: Optional[Statement], else_body: Optional[Grammar]):
     """
     if statement is None:
         raise GrammarSyntaxError(
-            "'else' doesn't seem to correspond to an 'on' or 'try'"
+            "'else' doesn't seem to correspond to an 'on' or 'try'",
         )
 
     statement.add_else(else_body)
@@ -285,7 +290,7 @@ class _StatementCollection:  # pylint: disable=too-few-public-methods
 
         if statement in self._statements:
             raise GrammarSyntaxError(
-                f"found duplicate {str(statement)!r} statements. These should be merged."
+                f"found duplicate {str(statement)!r} statements. These should be merged.",
             )
 
         self._statements.append(statement)

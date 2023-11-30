@@ -20,7 +20,6 @@ import textwrap
 import pydantic
 import pytest
 import yaml
-
 from craft_grammar.models import GrammarSingleEntryDictList, GrammarStr, GrammarStrList
 
 
@@ -46,8 +45,8 @@ def test_validate_grammar_trivial():
             grammar_single_entry_dictlist:
               - key: value
               - other_key: other_value
-            """
-        )
+            """,
+        ),
     )
 
     v = ValidationTest(**data)
@@ -79,8 +78,8 @@ def test_validate_grammar_simple():
                  - key: value
                  - other_key: other_value
               - else fail
-            """
-        )
+            """,
+        ),
     )
 
     v = ValidationTest(**data)
@@ -137,8 +136,8 @@ def test_validate_grammar_recursive():
                  - else:
                     - yet_another_key: yet_another_value
               - else fail
-            """
-        )
+            """,
+        ),
     )
 
     v = ValidationTest(**data)
@@ -149,7 +148,7 @@ def test_validate_grammar_recursive():
             "*else": [
                 {"*to arm64": "this other thing"},
                 "*else fail",
-            ]
+            ],
         },
     ]
     assert v.grammar_strlist == [
@@ -161,15 +160,15 @@ def test_validate_grammar_recursive():
                         "string",
                         "list",
                         {"*to amd64": ["with", "extras"]},
-                    ]
+                    ],
                 },
                 {
                     "*else": [
                         {"*on s390x": ["we're", "on", "s390x"]},
                         "*else fail",
-                    ]
+                    ],
                 },
-            ]
+            ],
         },
         {"*else": ["other", "stuff"]},
     ]
@@ -182,13 +181,13 @@ def test_validate_grammar_recursive():
                             "*to yet_another_arch": [
                                 {"key": "value"},
                                 {"other_key": "other_value"},
-                            ]
+                            ],
                         },
                         "*else fail",
-                    ]
+                    ],
                 },
                 {"*else": [{"yet_another_key": "yet_another_value"}]},
-            ]
+            ],
         },
         "*else fail",
     ]
@@ -266,7 +265,7 @@ def test_grammar_nested_error():
         GrammarValidation(
             x=[
                 {"on arm64,amd64": [{"on arm64": "foo"}, {"else": 35}]},
-            ]  # type: ignore
+            ],  # type: ignore
         )
     err = raised.value.errors()
     assert len(err) == 1

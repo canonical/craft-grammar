@@ -16,7 +16,6 @@
 
 
 import pytest
-
 from craft_grammar import errors
 
 scenarios = (

@@ -121,7 +121,7 @@ class GrammarSingleEntryDictList(_GrammarBase):
                     new_entry.append(item)
                 else:
                     raise TypeError(
-                        f"value must be a list of single-entry dictionaries: {entry!r}"
+                        f"value must be a list of single-entry dictionaries: {entry!r}",
                     )
             return new_entry
 

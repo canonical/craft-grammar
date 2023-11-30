@@ -98,7 +98,8 @@ def _extract_to_clause_selectors(to_statement: str) -> Set[str]:
     # to provide a very generic error when we can try to be more helpful.
     if _WHITESPACE_PATTERN.match(selector_group):
         raise ToStatementSyntaxError(
-            to_statement, message="spaces are not allowed in the selectors"
+            to_statement,
+            message="spaces are not allowed in the selectors",
         )
 
     return {selector.strip() for selector in selector_group.split(",")}

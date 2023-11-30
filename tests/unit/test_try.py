@@ -16,7 +16,6 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import pytest
-
 from craft_grammar import GrammarProcessor, TryStatement, errors
 
 scenarios = [
@@ -82,7 +81,9 @@ scenarios = [
 @pytest.mark.parametrize("scenario", scenarios)
 def test_try_statement_grammar(scenario):
     processor = GrammarProcessor(
-        arch="amd64", target_arch="amd64", checker=lambda x: "invalid" not in x
+        arch="amd64",
+        target_arch="amd64",
+        checker=lambda x: "invalid" not in x,
     )
     statement = TryStatement(body=scenario["body"], processor=processor)
 
