@@ -85,7 +85,7 @@ build-backend = "setuptools.build_meta"
 readme = {file = "README.rst"}
 
 [tool.setuptools_scm]
-write_to = "starcraft/_version.py"
+write_to = "craft_grammar/_version.py"
 # the version comes from the latest annotated git tag formatted as 'X.Y.Z'
 # version scheme:
 #   - X.Y.Z.post<commits since tag>+g<hash>.d<%Y%m%d>
@@ -139,7 +139,7 @@ exclude_also = [
 ]
 
 [tool.pyright]
-strict = ["starcraft"]
+strict = ["craft_grammar"]
 pythonVersion = "3.8"
 pythonPlatform = "Linux"
 exclude = [
@@ -204,7 +204,7 @@ warn_untyped_fields = true
 [tool.ruff]
 line-length = 88
 target-version = "py38"
-src = ["starcraft", "tests"]
+src = ["craft_grammar", "tests"]
 extend-exclude = [
     "docs",
     "__pycache__",

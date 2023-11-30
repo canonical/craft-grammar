@@ -110,7 +110,7 @@ always_document_param_types = True
 
 # Github config
 github_username = "canonical"
-github_repository = "starcraft-base"
+github_repository = "craft-grammar"
 
 # endregion
 
