@@ -17,9 +17,6 @@
 
 """Enhance part definitions with advanced grammar."""
 
-__version__ = "1.1.1"
-
-
 from . import errors
 from ._compound import CompoundStatement
 from ._on import OnStatement
@@ -27,6 +24,16 @@ from ._processor import GrammarProcessor
 from ._statement import CallStack, Grammar, Statement
 from ._to import ToStatement
 from ._try import TryStatement
+
+try:
+    from ._version import __version__
+except ImportError:  # pragma: no cover
+    from importlib.metadata import version, PackageNotFoundError
+
+    try:
+        __version__ = version("craft-grammar")
+    except PackageNotFoundError:
+        __version__ = "dev"
 
 __all__ = [
     "errors",
@@ -38,4 +45,5 @@ __all__ = [
     "Statement",
     "ToStatement",
     "TryStatement",
+    "__version__",
 ]
