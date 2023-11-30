@@ -51,19 +51,18 @@ release = craft_grammar.__version__
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "sphinx.ext.autodoc",
+    # "sphinx_toolbox.more_autodoc",
     "sphinx.ext.coverage",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
-    "sphinx_autodoc_typehints",  # must be loaded after napoleon
     "sphinx_design",
     "sphinx_copybutton",
     "sphinx-pydantic",
     "sphinx_toolbox",
-    "sphinx_toolbox.more_autodoc",
     "sphinx.ext.autodoc",  # Must be loaded after more_autodoc
+    "sphinx_autodoc_typehints",  # must be loaded after napoleon
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -115,17 +114,17 @@ github_repository = "craft-grammar"
 # endregion
 
 
-def run_apidoc(_):
-    import os
-    import sys
+# def run_apidoc(_):
+#     import os
+#     import sys
+#
+#     from sphinx.ext.apidoc import main
+#
+#     sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+#     cur_dir = os.path.abspath(os.path.dirname(__file__))
+#     module = os.path.join(cur_dir, "..", "craft_grammar")
+#     main(["-e", "-o", cur_dir, module, "--no-toc", "--force"])
 
-    from sphinx.ext.apidoc import main
 
-    sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-    cur_dir = os.path.abspath(os.path.dirname(__file__))
-    module = os.path.join(cur_dir, "..", "craft_grammar")
-    main(["-e", "-o", cur_dir, module, "--no-toc", "--force"])
-
-
-def setup(app):
-    app.connect("builder-inited", run_apidoc)
+# def setup(app):
+#     app.connect("builder-inited", run_apidoc)
