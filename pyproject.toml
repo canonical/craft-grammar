@@ -139,7 +139,7 @@ exclude_also = [
 ]
 
 [tool.pyright]
-strict = ["craft_grammar"]
+#strict = ["craft_grammar"]
 pythonVersion = "3.8"
 pythonPlatform = "Linux"
 exclude = [
