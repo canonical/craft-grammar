@@ -5,7 +5,7 @@ Changelog
 1.1.2 (2023-11-30)
 ------------------
 
-- Include packaging type information
+- Include type information
 
 1.1.1 (2022-02-28)
 ------------------
