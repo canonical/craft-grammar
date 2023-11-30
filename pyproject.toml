@@ -49,7 +49,6 @@ lint = [
     "pylint-fixme-info",
     "pylint-pydantic",
     "pylint-pytest",
-    "flake8",
     "isort==5.10.1",
 ]
 types = [

@@ -58,7 +58,7 @@ install: clean ## Install python package.
 	python setup.py install
 
 .PHONY: lint
-lint: test-black test-codespell test-flake8 test-isort test-mypy test-pydocstyle test-pylint test-pyright ## Run all linting tests.
+lint: test-black test-codespell test-isort test-mypy test-pydocstyle test-pylint test-pyright ## Run all linting tests.
 
 .PHONY: release
 release: dist ## Release with twine.
@@ -71,10 +71,6 @@ test-black:
 .PHONY: test-codespell
 test-codespell:
 	codespell .
-
-.PHONY: test-flake8
-test-flake8:
-	flake8 .
 
 .PHONY: test-integrations
 test-integrations: ## Run integration tests.
