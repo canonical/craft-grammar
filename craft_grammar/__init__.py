@@ -17,7 +17,7 @@
 
 """Enhance part definitions with advanced grammar."""
 
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 
 
 from . import errors
