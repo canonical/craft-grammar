@@ -7,7 +7,9 @@
     ".tox",
     "build",
     "docs",
-    "venv"
+    "venv",
+    ".venv"
   ],
-  "stubPath": ""
+  "stubPath": "",
+  "reportIncompatibleMethodOverride": "information"
 }
