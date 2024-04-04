@@ -120,6 +120,9 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
                 if statement is None:
                     primitives.append(section)
 
+            elif isinstance(section, (int | float | bool | list)):
+                # If the section is a number, boolean, or list, it's a primitive.
+                primitives.append(section)
             else:
                 # jsonschema should never let us get here.
                 raise GrammarSyntaxError(

@@ -338,11 +338,6 @@ error_scenarios = [
         "grammar_entry": ["else fail"],
         "expected_exception": ".*'else' doesn't seem to correspond.*",
     },
-    # unexpected type
-    {
-        "grammar_entry": [5],
-        "expected_exception": ".*expected grammar section.*but got.*",
-    },
 ]
 
 

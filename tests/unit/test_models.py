@@ -21,16 +21,30 @@ import pydantic
 import pytest
 import yaml
 
-from craft_grammar.models import GrammarSingleEntryDictList, GrammarStr, GrammarStrList
+from craft_grammar.models import (
+    GrammarBool,
+    GrammarDict,
+    GrammarDictList,
+    GrammarFloat,
+    GrammarInt,
+    GrammarSingleEntryDictList,
+    GrammarStr,
+    GrammarStrList,
+)
 
 
 class ValidationTest(pydantic.BaseModel):
     """A test model containing all types of grammar-aware types."""
 
     control: str
+    grammar_bool: GrammarBool
+    grammar_int: GrammarInt
+    grammar_float: GrammarFloat
     grammar_str: GrammarStr
     grammar_strlist: GrammarStrList
+    grammar_dict: GrammarDict
     grammar_single_entry_dictlist: GrammarSingleEntryDictList
+    grammar_dictlist: GrammarDictList
 
 
 def test_validate_grammar_trivial():
@@ -38,25 +52,44 @@ def test_validate_grammar_trivial():
         textwrap.dedent(
             """
             control: a string
+            grammar_bool: true
+            grammar_int: 42
+            grammar_float: 3.14
             grammar_str: another string
             grammar_strlist:
               - a
               - string
               - list
+            grammar_dict:
+              key: value
+              other_key: other_value
             grammar_single_entry_dictlist:
               - key: value
               - other_key: other_value
+            grammar_dictlist:
+              - key: value
+                other_key: other_value
+              - key2: value
+                other_key2: other_value
             """
         )
     )
 
     v = ValidationTest(**data)
     assert v.control == "a string"
+    assert v.grammar_bool is True
+    assert v.grammar_int == 42
+    assert v.grammar_float == 3.14
     assert v.grammar_str == "another string"
     assert v.grammar_strlist == ["a", "string", "list"]
+    assert v.grammar_dict == {"key": "value", "other_key": "other_value"}
     assert v.grammar_single_entry_dictlist == [
         {"key": "value"},
         {"other_key": "other_value"},
+    ]
+    assert v.grammar_dictlist == [
+        {"key": "value", "other_key": "other_value"},
+        {"key2": "value", "other_key2": "other_value"},
     ]
 
 
@@ -65,19 +98,40 @@ def test_validate_grammar_simple():
         textwrap.dedent(
             """
             control: a string
+            grammar_bool:
+              - on amd64: true
+              - else: false
+            grammar_int:
+              - on amd64: 42
+              - else: 23
+            grammar_float:
+              - on amd64: 3.14
+              - else: 2.71
             grammar_str:
               - on amd64: another string
               - else: something different
             grammar_strlist:
               - to amd64,arm64:
-                - a
-                - string
-                - list
+                  - a
+                  - string
+                  - list
+              - else fail
+            grammar_dict:
+              - on amd64:
+                  key: value
+                  other_key: other_value
               - else fail
             grammar_single_entry_dictlist:
               - on arch:
                  - key: value
                  - other_key: other_value
+              - else fail
+            grammar_dictlist:
+              - on arch:
+                 - key: value
+                   other_key: other_value
+                 - key2: value
+                   other_key2: other_value
               - else fail
             """
         )
@@ -85,6 +139,18 @@ def test_validate_grammar_simple():
 
     v = ValidationTest(**data)
     assert v.control == "a string"
+    assert v.grammar_bool == [
+        {"*on amd64": True},
+        {"*else": False},
+    ]
+    assert v.grammar_int == [
+        {"*on amd64": 42},
+        {"*else": 23},
+    ]
+    assert v.grammar_float == [
+        {"*on amd64": 3.14},
+        {"*else": 2.71},
+    ]
     assert v.grammar_str == [
         {"*on amd64": "another string"},
         {"*else": "something different"},
@@ -93,8 +159,21 @@ def test_validate_grammar_simple():
         {"*to amd64,arm64": ["a", "string", "list"]},
         "*else fail",
     ]
+    assert v.grammar_dict == [
+        {"*on amd64": {"key": "value", "other_key": "other_value"}},
+        "*else fail",
+    ]
     assert v.grammar_single_entry_dictlist == [
         {"*on arch": [{"key": "value"}, {"other_key": "other_value"}]},
+        "*else fail",
+    ]
+    assert v.grammar_dictlist == [
+        {
+            "*on arch": [
+                {"key": "value", "other_key": "other_value"},
+                {"key2": "value", "other_key2": "other_value"},
+            ]
+        },
         "*else fail",
     ]
 
@@ -104,6 +183,21 @@ def test_validate_grammar_recursive():
         textwrap.dedent(
             """
             control: a string
+            grammar_bool:
+              - on amd64: true
+              - else:
+                - to arm64: false
+                - else fail
+            grammar_int:
+              - on amd64: 42
+              - else:
+                - to arm64: 23
+                - else fail
+            grammar_float:
+              - on amd64: 3.14
+              - else:
+                - to arm64: 2.71
+                - else fail
             grammar_str:
               - on amd64: another string
               - else:
@@ -127,6 +221,16 @@ def test_validate_grammar_recursive():
               - else:
                 - other
                 - stuff
+            grammar_dict:
+                - on amd64,arm64:
+                    key: value
+                    other_key: other_value
+                - else:
+                    - on other_arch:
+                        - to yet_another_arch:
+                            yet_another_key: yet_another_value
+                        - else fail
+                    - else fail
             grammar_single_entry_dictlist:
               - on arch,other_arch:
                  - on other_arch:
@@ -137,12 +241,37 @@ def test_validate_grammar_recursive():
                  - else:
                     - yet_another_key: yet_another_value
               - else fail
+            grammar_dictlist:
+              - on arch,other_arch:
+                 - on other_arch:
+                    - to yet_another_arch:
+                       - key: value
+                         other_key: other_value
+                       - key2: value
+                         other_key2: other_value
+                    - else fail
+                 - else:
+                    - yet_another_key: yet_another_value
+                    - yet_another_key2: yet_another_value2
+              - else fail
             """
         )
     )
 
     v = ValidationTest(**data)
     assert v.control == "a string"
+    assert v.grammar_bool == [
+        {"*on amd64": True},
+        {"*else": [{"*to arm64": False}, "*else fail"]},
+    ]
+    assert v.grammar_int == [
+        {"*on amd64": 42},
+        {"*else": [{"*to arm64": 23}, "*else fail"]},
+    ]
+    assert v.grammar_float == [
+        {"*on amd64": 3.14},
+        {"*else": [{"*to arm64": 2.71}, "*else fail"]},
+    ]
     assert v.grammar_str == [
         {"*on amd64": "another string"},
         {
@@ -173,6 +302,25 @@ def test_validate_grammar_recursive():
         },
         {"*else": ["other", "stuff"]},
     ]
+    assert v.grammar_dict == [
+        {"*on amd64,arm64": {"key": "value", "other_key": "other_value"}},
+        {
+            "*else": [
+                {
+                    "*on other_arch": [
+                        {
+                            "*to yet_another_arch": {
+                                "yet_another_key": "yet_another_value"
+                            }
+                        },
+                        "*else fail",
+                    ]
+                },
+                "*else fail",
+            ]
+        },
+    ]
+
     assert v.grammar_single_entry_dictlist == [
         {
             "*on arch,other_arch": [
@@ -188,6 +336,35 @@ def test_validate_grammar_recursive():
                     ]
                 },
                 {"*else": [{"yet_another_key": "yet_another_value"}]},
+            ]
+        },
+        "*else fail",
+    ]
+
+    assert v.grammar_dictlist == [
+        {
+            "*on arch,other_arch": [
+                {
+                    "*on other_arch": [
+                        {
+                            "*to yet_another_arch": [
+                                {"key": "value", "other_key": "other_value"},
+                                {"key2": "value", "other_key2": "other_value"},
+                            ]
+                        },
+                        "*else fail",
+                    ]
+                },
+                {
+                    "*else": [
+                        {
+                            "yet_another_key": "yet_another_value",
+                        },
+                        {
+                            "yet_another_key2": "yet_another_value2",
+                        },
+                    ]
+                },
             ]
         },
         "*else fail",
