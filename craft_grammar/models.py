@@ -62,7 +62,7 @@ class GrammarBool(_GrammarBase):
     @classmethod
     @overrides
     def validate(cls, entry):
-        # GrammarInt entry can be a list if it contains clauses
+        # GrammarBool entry can be a list if it contains clauses
         if isinstance(entry, list):
             new_entry = []
             for item in entry:
@@ -206,14 +206,12 @@ class GrammarDict(_GrammarBase):
     @classmethod
     @overrides
     def validate(cls, entry):
-        # GrammarSingleEntryDictList will always be a list
+        # GrammarDict entry can be a list if it contains clauses
         if isinstance(entry, list):
             new_entry = []
             for item in entry:
                 if _is_grammar_clause(item):
                     cls._grammar_append(new_entry, item)
-                elif isinstance(item, dict):
-                    new_entry.append(item)
                 else:
                     raise TypeError(f"value must be a list of dictionaries: {entry!r}")
             return new_entry
@@ -232,7 +230,7 @@ class GrammarDictList(_GrammarBase):
     @classmethod
     @overrides
     def validate(cls, entry):
-        # GrammarSingleEntryDictList will always be a list
+        # GrammarDictList will always be a list
         if isinstance(entry, list):
             new_entry = []
             for item in entry:
