@@ -129,7 +129,7 @@ class GrammarFloat(_GrammarBase):
 class GrammarStr(_GrammarBase):
     """Grammar-enabled string field."""
 
-    __root__: str
+    __root__: bytes
 
     @classmethod
     @overrides
@@ -150,7 +150,7 @@ class GrammarStr(_GrammarBase):
 class GrammarStrList(_GrammarBase):
     """Grammar-enabled list of strings field."""
 
-    __root__: List[str]
+    __root__: bytes
 
     @classmethod
     @overrides
@@ -171,7 +171,7 @@ class GrammarStrList(_GrammarBase):
 class GrammarSingleEntryDictList(_GrammarBase):
     """Grammar-enabled list of dictionaries field."""
 
-    __root__: List[Dict[str, Any]]
+    __root__: bytes
 
     @classmethod
     @overrides
