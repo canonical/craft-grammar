@@ -129,7 +129,7 @@ class GrammarFloat(_GrammarBase):
 class GrammarStr(_GrammarBase):
     """Grammar-enabled string field."""
 
-    __root__: Union[str, _GrammarType]
+    __root__: str
 
     @classmethod
     @overrides
@@ -144,16 +144,13 @@ class GrammarStr(_GrammarBase):
                     raise TypeError(f"value must be a string: {entry!r}")
             return new_entry
 
-        if isinstance(entry, str):
-            return entry
-
-        raise TypeError(f"value must be a string: {entry!r}")
+        return entry
 
 
 class GrammarStrList(_GrammarBase):
     """Grammar-enabled list of strings field."""
 
-    __root__: Union[List[Union[str, _GrammarType]], _GrammarType]
+    __root__: List[str]
 
     @classmethod
     @overrides
@@ -164,10 +161,8 @@ class GrammarStrList(_GrammarBase):
             for item in entry:
                 if _is_grammar_clause(item):
                     cls._grammar_append(new_entry, item)
-                elif isinstance(item, str):
-                    new_entry.append(item)
                 else:
-                    raise TypeError(f"value must be a list of string: {entry!r}")
+                    new_entry.append(item)
             return new_entry
 
         raise TypeError(f"value must be a list of string: {entry!r}")
@@ -176,7 +171,7 @@ class GrammarStrList(_GrammarBase):
 class GrammarSingleEntryDictList(_GrammarBase):
     """Grammar-enabled list of dictionaries field."""
 
-    __root__: Union[List[Dict[str, Any]], _GrammarType]
+    __root__: List[Dict[str, Any]]
 
     @classmethod
     @overrides
@@ -187,12 +182,8 @@ class GrammarSingleEntryDictList(_GrammarBase):
             for item in entry:
                 if _is_grammar_clause(item):
                     cls._grammar_append(new_entry, item)
-                elif isinstance(item, dict) and len(item) == 1:
-                    new_entry.append(item)
                 else:
-                    raise TypeError(
-                        f"value must be a list of single-entry dictionaries: {entry!r}"
-                    )
+                    new_entry.append(item)
             return new_entry
 
         raise TypeError(f"value must be a list of single-entry dictionaries: {entry!r}")
