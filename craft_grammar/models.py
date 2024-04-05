@@ -144,7 +144,8 @@ class GrammarStr(_GrammarBase):
                     raise TypeError(f"value must be a string: {entry!r}")
             return new_entry
 
-        return entry
+        # return entry
+        raise TypeError("Hi I'm really here!!")
 
 
 class GrammarStrList(_GrammarBase):
@@ -163,7 +164,8 @@ class GrammarStrList(_GrammarBase):
                     cls._grammar_append(new_entry, item)
                 else:
                     new_entry.append(item)
-            return new_entry
+            # return entry
+            raise TypeError("Hi I'm really here!!")
 
         raise TypeError(f"value must be a list of string: {entry!r}")
 
@@ -184,7 +186,8 @@ class GrammarSingleEntryDictList(_GrammarBase):
                     cls._grammar_append(new_entry, item)
                 else:
                     new_entry.append(item)
-            return new_entry
+            # return entry
+            raise TypeError("Hi I'm really here!!")
 
         raise TypeError(f"value must be a list of single-entry dictionaries: {entry!r}")
 
