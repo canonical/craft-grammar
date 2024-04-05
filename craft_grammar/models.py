@@ -31,6 +31,9 @@ _ELSE = "else"
 _TRY = "try"
 
 
+_GrammarType = Dict[str, Any]
+
+
 class _GrammarBase(abc.ABC):
     @classmethod
     def __get_validators__(cls):
@@ -50,10 +53,77 @@ class _GrammarBase(abc.ABC):
             _mark_and_append(entry, {key: cls.validate(value)})
 
 
-_GrammarType = Dict[str, Any]
-
-
 # Public types for grammar-enabled attributes
+class GrammarBool(_GrammarBase):
+    """Grammar-enabled bool field."""
+
+    __root__: Union[bool, _GrammarType]
+
+    @classmethod
+    @overrides
+    def validate(cls, entry):
+        # GrammarBool entry can be a list if it contains clauses
+        if isinstance(entry, list):
+            new_entry = []
+            for item in entry:
+                if _is_grammar_clause(item):
+                    cls._grammar_append(new_entry, item)
+                else:
+                    raise TypeError(f"value must be a list of bool: {entry!r}")
+            return new_entry
+
+        if isinstance(entry, bool):
+            return entry
+
+        raise TypeError(f"value must be a bool: {entry!r}")
+
+
+class GrammarInt(_GrammarBase):
+    """Grammar-enabled integer field."""
+
+    __root__: Union[int, _GrammarType]
+
+    @classmethod
+    @overrides
+    def validate(cls, entry):
+        # GrammarInt entry can be a list if it contains clauses
+        if isinstance(entry, list):
+            new_entry = []
+            for item in entry:
+                if _is_grammar_clause(item):
+                    cls._grammar_append(new_entry, item)
+                else:
+                    raise TypeError(f"value must be a list of integer: {entry!r}")
+            return new_entry
+
+        if isinstance(entry, int):
+            return entry
+
+        raise TypeError(f"value must be a integer: {entry!r}")
+
+
+class GrammarFloat(_GrammarBase):
+    """Grammar-enabled float field."""
+
+    __root__: Union[float, _GrammarType]
+
+    @classmethod
+    @overrides
+    def validate(cls, entry):
+        # GrammarFloat entry can be a list if it contains clauses
+        if isinstance(entry, list):
+            new_entry = []
+            for item in entry:
+                if _is_grammar_clause(item):
+                    cls._grammar_append(new_entry, item)
+                else:
+                    raise TypeError(f"value must be a list of float: {entry!r}")
+            return new_entry
+
+        if isinstance(entry, (int, float)):
+            return float(entry)
+
+        raise TypeError(f"value must be a float: {entry!r}")
 
 
 class GrammarStr(_GrammarBase):
@@ -126,6 +196,53 @@ class GrammarSingleEntryDictList(_GrammarBase):
             return new_entry
 
         raise TypeError(f"value must be a list of single-entry dictionaries: {entry!r}")
+
+
+class GrammarDict(_GrammarBase):
+    """Grammar-enabled dictionary field."""
+
+    __root__: Union[Dict[str, Any], _GrammarType]
+
+    @classmethod
+    @overrides
+    def validate(cls, entry):
+        # GrammarDict entry can be a list if it contains clauses
+        if isinstance(entry, list):
+            new_entry = []
+            for item in entry:
+                if _is_grammar_clause(item):
+                    cls._grammar_append(new_entry, item)
+                else:
+                    raise TypeError(f"value must be a list of dictionaries: {entry!r}")
+            return new_entry
+
+        if isinstance(entry, dict):
+            return entry
+
+        raise TypeError(f"value must be a dictionary: {entry!r}")
+
+
+class GrammarDictList(_GrammarBase):
+    """Grammar-enabled list of dictionary field."""
+
+    __root__: Union[List[Dict[str, Any]], _GrammarType]
+
+    @classmethod
+    @overrides
+    def validate(cls, entry):
+        # GrammarDictList will always be a list
+        if isinstance(entry, list):
+            new_entry = []
+            for item in entry:
+                if _is_grammar_clause(item):
+                    cls._grammar_append(new_entry, item)
+                elif isinstance(item, dict):
+                    new_entry.append(item)
+                else:
+                    raise TypeError(f"value must be a list of dictionaries: {entry!r}")
+            return new_entry
+
+        raise TypeError(f"value must be a list of dictionary: {entry!r}")
 
 
 def _ensure_selector_valid(selector: str, *, clause: str) -> None:
