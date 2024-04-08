@@ -373,7 +373,7 @@ def test_validate_grammar_recursive():
 
 @pytest.mark.parametrize(
     "value",
-    [23, True, ["foo"], {"x"}, [{"a": "b"}]],
+    [["foo"], {"x"}, [{"a": "b"}]],
 )
 def test_grammar_str_error(value):
     class GrammarValidation(pydantic.BaseModel):
@@ -388,12 +388,12 @@ def test_grammar_str_error(value):
     assert len(err) == 1
     assert err[0]["loc"] == ("x",)
     assert err[0]["type"] == "type_error"
-    assert err[0]["msg"] == f"value must be a string: {value!r}"
+    assert err[0]["msg"] == f"value must be a str: {value!r}"
 
 
 @pytest.mark.parametrize(
     "value",
-    [23, "foo", ["foo", 23], {"x"}, [{"a": "b"}]],
+    [{"x"}, [{"a": "b"}]],
 )
 def test_grammar_strlist_error(value):
     class GrammarValidation(pydantic.BaseModel):
@@ -442,14 +442,19 @@ def test_grammar_nested_error():
     with pytest.raises(pydantic.ValidationError) as raised:
         GrammarValidation(
             x=[
-                {"on arm64,amd64": [{"on arm64": "foo"}, {"else": 35}]},
+                {
+                    "on arm64,amd64": [
+                        {"on arm64": "foo"},
+                        {"else": ["a list", "of strings"]},
+                    ]
+                },
             ]  # type: ignore
         )
     err = raised.value.errors()
     assert len(err) == 1
     assert err[0]["loc"] == ("x",)
     assert err[0]["type"] == "type_error"
-    assert err[0]["msg"] == "value must be a string: 35"
+    assert err[0]["msg"] == "value must be a string: ['a list', 'of strings']"
 
 
 def test_grammar_str_elsefail():
