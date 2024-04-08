@@ -61,6 +61,49 @@ class _GrammarBase(abc.ABC):
             _mark_and_append(entry, {key: cls.validate(value)})
 
 
+# # Define Wrapper Class
+# class GrammarListGenerator:
+#
+#     # Define __getitem__ method to be able to use index
+#     @cache
+#     def __getitem__(self, key_type, value_type):
+#
+#         # Define Main Class
+#         class GrammarList(_GrammarBase):
+#             @classmethod
+#             @overrides
+#             def validate(cls, entry):
+#                 # Grammar[T] entry can be a list if it contains clauses
+#                 if isinstance(entry, list):
+#                     new_entry = []
+#                     valid_grammar = True
+#                     for item in entry:
+#                         if _is_grammar_clause(item):
+#                             cls._grammar_append(new_entry, item)
+#                         else:
+#                             try:
+#                                 for validator in find_validators(item_type, _CONFIG):
+#                                     entry = validator(entry)
+#                             except PydanticTypeError:
+#                                 raise TypeError(
+#                                     f"value must be a list of {item_type.__name__}: {entry!r}"
+#                                 )
+#
+#                     if valid_grammar:
+#                         return new_entry
+#
+#                 try:
+#                     for validator in find_validators(type_, _CONFIG):
+#                         entry = validator(entry)
+#                 except PydanticTypeError:
+#                     raise TypeError(f"value must be a {type_.__name__}: {entry!r}")
+#
+#             return entry
+#
+#
+# GrammarList[int]
+
+
 # Define Wrapper Class
 class GrammarClassGenerator:
 
@@ -76,14 +119,15 @@ class GrammarClassGenerator:
                 # Grammar[T] entry can be a list if it contains clauses
                 if isinstance(entry, list):
                     new_entry = []
+                    valid_grammar = True
                     for item in entry:
                         if _is_grammar_clause(item):
                             cls._grammar_append(new_entry, item)
                         else:
-                            raise TypeError(
-                                f"value must be a {type_.__name__}: {entry!r}"
-                            )
-                    return new_entry
+                            valid_grammar = False
+
+                    if valid_grammar:
+                        return new_entry
 
                 try:
                     for validator in find_validators(type_, _CONFIG):
@@ -97,8 +141,19 @@ class GrammarClassGenerator:
 
 
 GrammarScalar = GrammarClassGenerator()
+"""
+string_value1: "a-string"
+
+string_value2:
+  - on amd64: "value-for-amd64"
+  - on arm: 1
+  - else: {a:b}
 
 
+my_value:
+  key_one: 1
+  key_two: "opkda"
+"""
 GrammarStr = GrammarScalar[str]
 
 
@@ -178,7 +233,7 @@ class GrammarFloat(_GrammarBase):
 class GrammarStrList(_GrammarBase):
     """Grammar-enabled list of strings field."""
 
-    validators = list(find_validators(typing.List[str], _CONFIG))
+    __root__: Union[List[Union[str, _GrammarType]], _GrammarType]
 
     @classmethod
     @overrides
@@ -189,22 +244,13 @@ class GrammarStrList(_GrammarBase):
             for item in entry:
                 if _is_grammar_clause(item):
                     cls._grammar_append(new_entry, item)
-                else:
-                    try:
-                        for validator in GrammarStr.validators:
-                            item = validator(item)
-                    except PydanticTypeError:
-                        raise TypeError(f"value must be a list of string: {entry!r}")
+                elif isinstance(item, str):
                     new_entry.append(item)
+                else:
+                    raise TypeError(f"value must be a list of string: {entry!r}")
             return new_entry
 
-        try:
-            for validator in cls.validators:
-                entry = validator(entry)
-        except PydanticTypeError:
-            raise TypeError(f"value must be a list of string: {entry!r}")
-
-        return entry
+        raise TypeError(f"value must be a list of string: {entry!r}")
 
 
 class GrammarSingleEntryDictList(_GrammarBase):

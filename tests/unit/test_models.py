@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
+from pydantic.validators import find_validators
 import textwrap
 
 import pydantic
@@ -30,6 +30,7 @@ from craft_grammar.models import (
     GrammarSingleEntryDictList,
     GrammarStr,
     GrammarStrList,
+    _CONFIG,
 )
 
 
@@ -369,6 +370,15 @@ def test_validate_grammar_recursive():
         },
         "*else fail",
     ]
+
+
+def test_bla():
+    d1 = {
+        1: "str",
+        "asokdaps": 2,
+    }
+    for v in find_validators(dict, _CONFIG):
+        d1 = v(d1)
 
 
 @pytest.mark.parametrize(
