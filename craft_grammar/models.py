@@ -85,8 +85,6 @@ class GrammarGeneratorMetaClass(type):
 
     # Define __getitem__ method to be able to use index
     def __getitem__(cls, type_):
-
-        # pylint: disable=too-many-branches
         class GrammarScalar(_GrammarBase):
             """Grammar scalar class.
 
@@ -129,27 +127,10 @@ class GrammarGeneratorMetaClass(type):
                     if get_origin(cls._type) is not dict:
                         raise TypeError(_format_type_error(cls._type, entry))
 
-                    sub_type = get_args(cls._type)
-                    # The dict is not a typed dict
-                    if not sub_type:
-                        return entry
-
-                    sub_key_type = sub_type[0] if sub_type else Any
-                    sub_value_type = sub_type[1] if sub_type else Any
-
-                    # validate the dict
-                    for key, value in entry.items():
-                        if (sub_key_type is Any or isinstance(key, sub_key_type)) and (
-                            sub_value_type is Any or isinstance(value, sub_value_type)
-                        ):
-                            # we do not need the return value if it is a valid dict
-                            pass
-                        else:
-                            raise TypeError(_format_type_error(cls._type, entry))
-
+                    # we do not care about the dict contents type, other models will handle it
                     return entry
 
-                # handle standard types with pydantic validators
+                # handle primitive types with pydantic validators
                 try:
                     for validator in find_validators(cls._type, BaseConfig):
                         # we do not need the return value of the validator
