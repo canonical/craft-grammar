@@ -77,10 +77,10 @@ def _format_type_error(type_: type, entry: Any) -> str:
     return f"value must be a {type_.__name__}: {entry!r}"
 
 
-class GrammarGeneratorMetaClass(type):
-    """Grammar generator metaclass.
+class GrammarMetaClass(type):
+    """Grammar type metaclass.
 
-    Allows to use GrammarGenerator[T] to define a grammar-aware type.
+    Allows to use GrammarType[T] to define a grammar-aware type.
     """
 
     # Define __getitem__ method to be able to use index
@@ -91,15 +91,13 @@ class GrammarGeneratorMetaClass(type):
             Dynamically generated class to handle grammar-aware types.
             """
 
-            _type = type_
-
             @classmethod
             @overrides
             def validate(cls, entry):
                 # Grammar[T] entry can be a list if it contains clauses
                 if isinstance(entry, list):
                     # Check if the type_ supposed to be a list
-                    sub_type = get_args(cls._type)
+                    sub_type = get_args(type_)
 
                     # handle typed list
                     if sub_type:
@@ -117,40 +115,40 @@ class GrammarGeneratorMetaClass(type):
                             if sub_type and isinstance(item, sub_type):
                                 new_entry.append(item)
                             else:
-                                raise TypeError(_format_type_error(cls._type, entry))
+                                raise TypeError(_format_type_error(type_, entry))
 
                     return new_entry
 
                 # Not a valid grammar, check if it is a dict
                 if isinstance(entry, dict):
                     # Check if the type_ supposed to be a dict
-                    if get_origin(cls._type) is not dict:
-                        raise TypeError(_format_type_error(cls._type, entry))
+                    if get_origin(type_) is not dict:
+                        raise TypeError(_format_type_error(type_, entry))
 
                     # we do not care about the dict contents type, other models will handle it
                     return entry
 
                 # handle primitive types with pydantic validators
                 try:
-                    for validator in find_validators(cls._type, BaseConfig):
+                    for validator in find_validators(type_, BaseConfig):
                         # we do not need the return value of the validator
                         validator(entry)
                 except PydanticTypeError as err:
-                    raise TypeError(_format_type_error(cls._type, entry)) from err
+                    raise TypeError(_format_type_error(type_, entry)) from err
 
                 return entry
 
         return GrammarScalar
 
 
-class GrammarGenerator(Generic[T], metaclass=GrammarGeneratorMetaClass):
-    """Grammar generator class.
+class GrammarType(Generic[T], metaclass=GrammarMetaClass):
+    """Grammar aware type.
 
-    Allows to use GrammarGenerator[T] to define a grammar-aware type.
+    Allows to use GrammarType[T] to define a grammar-aware type.
 
-    GrammarGenerator[int]
-    GrammarGenerator[list[str]]
-    GrammarGenerator[dict[str, int]]
+    GrammarType[int]
+    GrammarType[list[str]]
+    GrammarType[dict[str, int]]
 
     """
 

@@ -16,26 +16,26 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import textwrap
-from typing import Any
+from typing import Any, Dict, List
 
 import pydantic
 import pytest
 import yaml
 
-from craft_grammar.models import GrammarGenerator
+from craft_grammar.models import GrammarType
 
 
 class ValidationTest(pydantic.BaseModel):
     """A test model containing all types of grammar-aware types."""
 
     control: str
-    grammar_bool: GrammarGenerator[bool]
-    grammar_int: GrammarGenerator[int]
-    grammar_float: GrammarGenerator[float]
-    grammar_str: GrammarGenerator[str]
-    grammar_strlist: GrammarGenerator[list[str]]
-    grammar_dict: GrammarGenerator[dict[str, Any]]
-    grammar_dictlist: GrammarGenerator[list[dict]]
+    grammar_bool: GrammarType[bool]
+    grammar_int: GrammarType[int]
+    grammar_float: GrammarType[float]
+    grammar_str: GrammarType[str]
+    grammar_strlist: GrammarType[List[str]]
+    grammar_dict: GrammarType[Dict[str, Any]]
+    grammar_dictlist: GrammarType[List[Dict]]
 
 
 def test_validate_grammar_trivial():
@@ -324,7 +324,7 @@ def test_grammar_str_error(value):
     class GrammarValidation(pydantic.BaseModel):
         """Test validation of grammar-enabled types."""
 
-        x: GrammarGenerator[str]
+        x: GrammarType[str]
 
     with pytest.raises(pydantic.ValidationError) as raised:
         GrammarValidation(x=value)  # type: ignore
@@ -344,7 +344,7 @@ def test_grammar_strlist_error(value):
     class GrammarValidation(pydantic.BaseModel):
         """Test validation of grammar-enabled types."""
 
-        x: GrammarGenerator[list[str]]
+        x: GrammarType[list[str]]
 
     with pytest.raises(pydantic.ValidationError) as raised:
         GrammarValidation(x=value)  # type: ignore
@@ -360,7 +360,7 @@ def test_grammar_nested_error():
     class GrammarValidation(pydantic.BaseModel):
         """Test validation of grammar-enabled types."""
 
-        x: GrammarGenerator[str]
+        x: GrammarType[str]
 
     with pytest.raises(pydantic.ValidationError) as raised:
         GrammarValidation(
@@ -379,7 +379,7 @@ def test_grammar_str_elsefail():
     class GrammarValidation(pydantic.BaseModel):
         """Test validation of grammar-enabled types."""
 
-        x: GrammarGenerator[str]
+        x: GrammarType[str]
 
     GrammarValidation(x=[{"on arch": "foo"}, "else fail"])  # type: ignore
 
@@ -388,7 +388,7 @@ def test_grammar_strlist_elsefail():
     class GrammarValidation(pydantic.BaseModel):
         """Test validation of grammar-enabled types."""
 
-        x: GrammarGenerator[list[str]]
+        x: GrammarType[list[str]]
 
     GrammarValidation(x=[{"on arch": ["foo"]}, "else fail"])  # type: ignore
 
@@ -397,7 +397,7 @@ def test_grammar_try():
     class GrammarValidation(pydantic.BaseModel):
         """Test validation of grammar-enabled types."""
 
-        x: GrammarGenerator[str]
+        x: GrammarType[str]
 
     with pytest.raises(pydantic.ValidationError) as raised:
         GrammarValidation(x=[{"try": "foo"}])  # type: ignore
@@ -440,7 +440,7 @@ def test_grammar_errors(clause, err_msg):
     class GrammarValidation(pydantic.BaseModel):
         """Test validation of grammar-enabled types."""
 
-        x: GrammarGenerator[str]
+        x: GrammarType[str]
 
     with pytest.raises(pydantic.ValidationError) as raised:
         GrammarValidation(x=[{clause: "foo"}])  # type: ignore
