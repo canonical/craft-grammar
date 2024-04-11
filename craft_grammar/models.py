@@ -1,6 +1,6 @@
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
-# Copyright 2022 Canonical Ltd.
+# Copyright 2022-2024 Canonical Ltd.
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -71,7 +71,7 @@ def _format_type_error(type_: type, entry: Any) -> str:
 
     if issubclass(origin, dict):
         if len(args) == 2:
-            return f"value must be a dict of {args[0].__name__} and {args[1].__name__}: {entry!r}"
+            return f"value must be a dict of {args[0].__name__} to {args[1].__name__}: {entry!r}"
         return f"value must be a dict: {entry!r}"
 
     return f"value must be a {type_.__name__}: {entry!r}"
@@ -141,14 +141,14 @@ class GrammarMetaClass(type):
         return GrammarScalar
 
 
-class GrammarType(Generic[T], metaclass=GrammarMetaClass):
+class Grammar(Generic[T], metaclass=GrammarMetaClass):
     """Grammar aware type.
 
-    Allows to use GrammarType[T] to define a grammar-aware type.
+    Allows to use Grammar[T] to define a grammar-aware type.
 
-    GrammarType[int]
-    GrammarType[list[str]]
-    GrammarType[dict[str, int]]
+    Grammar[int]
+    Grammar[list[str]]
+    Grammar[dict[str, int]]
 
     """
 
