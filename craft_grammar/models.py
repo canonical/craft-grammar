@@ -1,6 +1,6 @@
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
-# Copyright 2022 Canonical Ltd.
+# Copyright 2022-2024 Canonical Ltd.
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -18,9 +18,11 @@
 
 import abc
 import re
-from typing import Any, Dict, List, Union
+from typing import Any, Generic, List, TypeVar, get_args, get_origin
 
 from overrides import overrides
+from pydantic import BaseConfig, PydanticTypeError
+from pydantic.validators import find_validators
 
 _on_pattern = re.compile(r"^on\s+(.+)\s*$")
 _to_pattern = re.compile(r"^to\s+(.+)\s*$")
@@ -31,7 +33,7 @@ _ELSE = "else"
 _TRY = "try"
 
 
-_GrammarType = Dict[str, Any]
+T = TypeVar("T")
 
 
 class _GrammarBase(abc.ABC):
@@ -53,196 +55,102 @@ class _GrammarBase(abc.ABC):
             _mark_and_append(entry, {key: cls.validate(value)})
 
 
-# Public types for grammar-enabled attributes
-class GrammarBool(_GrammarBase):
-    """Grammar-enabled bool field."""
+def _format_type_error(type_: type, entry: Any) -> str:
+    """Format a type error message."""
+    origin = get_origin(type_)
+    args = get_args(type_)
 
-    __root__: Union[bool, _GrammarType]
+    # handle primitive types which origin is None
+    if not origin:
+        origin = type_
 
-    @classmethod
-    @overrides
-    def validate(cls, entry):
-        # GrammarBool entry can be a list if it contains clauses
-        if isinstance(entry, list):
-            new_entry = []
-            for item in entry:
-                if _is_grammar_clause(item):
-                    cls._grammar_append(new_entry, item)
-                else:
-                    raise TypeError(f"value must be a list of bool: {entry!r}")
-            return new_entry
+    if issubclass(origin, list):
+        if args:
+            return f"value must be a list of {args[0].__name__}: {entry!r}"
+        return f"value must be a list: {entry!r}"
 
-        if isinstance(entry, bool):
-            return entry
+    if issubclass(origin, dict):
+        if len(args) == 2:
+            return f"value must be a dict of {args[0].__name__} to {args[1].__name__}: {entry!r}"
+        return f"value must be a dict: {entry!r}"
 
-        raise TypeError(f"value must be a bool: {entry!r}")
+    return f"value must be a {type_.__name__}: {entry!r}"
 
 
-class GrammarInt(_GrammarBase):
-    """Grammar-enabled integer field."""
+class GrammarMetaClass(type):
+    """Grammar type metaclass.
 
-    __root__: Union[int, _GrammarType]
+    Allows to use GrammarType[T] to define a grammar-aware type.
+    """
 
-    @classmethod
-    @overrides
-    def validate(cls, entry):
-        # GrammarInt entry can be a list if it contains clauses
-        if isinstance(entry, list):
-            new_entry = []
-            for item in entry:
-                if _is_grammar_clause(item):
-                    cls._grammar_append(new_entry, item)
-                else:
-                    raise TypeError(f"value must be a list of integer: {entry!r}")
-            return new_entry
+    # Define __getitem__ method to be able to use index
+    def __getitem__(cls, type_):
+        class GrammarScalar(_GrammarBase):
+            """Grammar scalar class.
 
-        if isinstance(entry, int):
-            return entry
+            Dynamically generated class to handle grammar-aware types.
+            """
 
-        raise TypeError(f"value must be a integer: {entry!r}")
+            @classmethod
+            @overrides
+            def validate(cls, entry):
+                # Grammar[T] entry can be a list if it contains clauses
+                if isinstance(entry, list):
+                    # Check if the type_ supposed to be a list
+                    sub_type = get_args(type_)
 
+                    # handle typed list
+                    if sub_type:
+                        sub_type = sub_type[0]
+                        if sub_type is Any:
+                            sub_type = None
 
-class GrammarFloat(_GrammarBase):
-    """Grammar-enabled float field."""
+                    new_entry = []
+                    for item in entry:
+                        # Check if the item is a valid grammar clause
+                        if _is_grammar_clause(item):
+                            cls._grammar_append(new_entry, item)
+                        else:
+                            # Check if the item is a valid type if not a grammar clause
+                            if sub_type and isinstance(item, sub_type):
+                                new_entry.append(item)
+                            else:
+                                raise TypeError(_format_type_error(type_, entry))
 
-    __root__: Union[float, _GrammarType]
+                    return new_entry
 
-    @classmethod
-    @overrides
-    def validate(cls, entry):
-        # GrammarFloat entry can be a list if it contains clauses
-        if isinstance(entry, list):
-            new_entry = []
-            for item in entry:
-                if _is_grammar_clause(item):
-                    cls._grammar_append(new_entry, item)
-                else:
-                    raise TypeError(f"value must be a list of float: {entry!r}")
-            return new_entry
+                # Not a valid grammar, check if it is a dict
+                if isinstance(entry, dict):
+                    # Check if the type_ supposed to be a dict
+                    if get_origin(type_) is not dict:
+                        raise TypeError(_format_type_error(type_, entry))
 
-        if isinstance(entry, (int, float)):
-            return float(entry)
+                    # we do not care about the dict contents type, other models will handle it
+                    return entry
 
-        raise TypeError(f"value must be a float: {entry!r}")
+                # handle primitive types with pydantic validators
+                try:
+                    for validator in find_validators(type_, BaseConfig):
+                        # we do not need the return value of the validator
+                        validator(entry)
+                except PydanticTypeError as err:
+                    raise TypeError(_format_type_error(type_, entry)) from err
 
+                return entry
 
-class GrammarStr(_GrammarBase):
-    """Grammar-enabled string field."""
-
-    __root__: Union[str, _GrammarType]
-
-    @classmethod
-    @overrides
-    def validate(cls, entry):
-        # GrammarStr entry can be a list if it contains clauses
-        if isinstance(entry, list):
-            new_entry = []
-            for item in entry:
-                if _is_grammar_clause(item):
-                    cls._grammar_append(new_entry, item)
-                else:
-                    raise TypeError(f"value must be a string: {entry!r}")
-            return new_entry
-
-        if isinstance(entry, str):
-            return entry
-
-        raise TypeError(f"value must be a string: {entry!r}")
+        return GrammarScalar
 
 
-class GrammarStrList(_GrammarBase):
-    """Grammar-enabled list of strings field."""
+class Grammar(Generic[T], metaclass=GrammarMetaClass):
+    """Grammar aware type.
 
-    __root__: Union[List[Union[str, _GrammarType]], _GrammarType]
+    Allows to use Grammar[T] to define a grammar-aware type.
 
-    @classmethod
-    @overrides
-    def validate(cls, entry):
-        # GrammarStrList will always be a list
-        if isinstance(entry, list):
-            new_entry = []
-            for item in entry:
-                if _is_grammar_clause(item):
-                    cls._grammar_append(new_entry, item)
-                elif isinstance(item, str):
-                    new_entry.append(item)
-                else:
-                    raise TypeError(f"value must be a list of string: {entry!r}")
-            return new_entry
+    Grammar[int]
+    Grammar[list[str]]
+    Grammar[dict[str, int]]
 
-        raise TypeError(f"value must be a list of string: {entry!r}")
-
-
-class GrammarSingleEntryDictList(_GrammarBase):
-    """Grammar-enabled list of dictionaries field."""
-
-    __root__: Union[List[Dict[str, Any]], _GrammarType]
-
-    @classmethod
-    @overrides
-    def validate(cls, entry):
-        # GrammarSingleEntryDictList will always be a list
-        if isinstance(entry, list):
-            new_entry = []
-            for item in entry:
-                if _is_grammar_clause(item):
-                    cls._grammar_append(new_entry, item)
-                elif isinstance(item, dict) and len(item) == 1:
-                    new_entry.append(item)
-                else:
-                    raise TypeError(
-                        f"value must be a list of single-entry dictionaries: {entry!r}"
-                    )
-            return new_entry
-
-        raise TypeError(f"value must be a list of single-entry dictionaries: {entry!r}")
-
-
-class GrammarDict(_GrammarBase):
-    """Grammar-enabled dictionary field."""
-
-    __root__: Union[Dict[str, Any], _GrammarType]
-
-    @classmethod
-    @overrides
-    def validate(cls, entry):
-        # GrammarDict entry can be a list if it contains clauses
-        if isinstance(entry, list):
-            new_entry = []
-            for item in entry:
-                if _is_grammar_clause(item):
-                    cls._grammar_append(new_entry, item)
-                else:
-                    raise TypeError(f"value must be a list of dictionaries: {entry!r}")
-            return new_entry
-
-        if isinstance(entry, dict):
-            return entry
-
-        raise TypeError(f"value must be a dictionary: {entry!r}")
-
-
-class GrammarDictList(_GrammarBase):
-    """Grammar-enabled list of dictionary field."""
-
-    __root__: Union[List[Dict[str, Any]], _GrammarType]
-
-    @classmethod
-    @overrides
-    def validate(cls, entry):
-        # GrammarDictList will always be a list
-        if isinstance(entry, list):
-            new_entry = []
-            for item in entry:
-                if _is_grammar_clause(item):
-                    cls._grammar_append(new_entry, item)
-                elif isinstance(item, dict):
-                    new_entry.append(item)
-                else:
-                    raise TypeError(f"value must be a list of dictionaries: {entry!r}")
-            return new_entry
-
-        raise TypeError(f"value must be a list of dictionary: {entry!r}")
+    """
 
 
 def _ensure_selector_valid(selector: str, *, clause: str) -> None:
