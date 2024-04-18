@@ -27,6 +27,7 @@ from ._processor import GrammarProcessor
 from ._statement import CallStack, Grammar, Statement
 from ._to import ToStatement
 from ._try import TryStatement
+from .create import create_grammar_model
 
 __all__ = [
     "errors",
@@ -38,4 +39,5 @@ __all__ = [
     "Statement",
     "ToStatement",
     "TryStatement",
+    "create_grammar_model",
 ]
