@@ -1,6 +1,6 @@
-# This file is part of starcraft.
+# This file is part of craft-grammar.
 #
-# Copyright 2023 Canonical Ltd.
+# Copyright 2024 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 3, as published
@@ -13,33 +13,12 @@
 #
 # You should have received a copy of the GNU General Public License along
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""Basic Starcraft package demo unit tests."""
+"""Basic craft-grammar package demo unit tests."""
 # pyright: reportFunctionMemberAccess=false
 from unittest import mock
 
-import starcraft
+import craft_grammar
 
 
 def test_version():
-    assert starcraft.__version__ is not None
-
-
-def test_hello(mocker):
-    mocker.patch("builtins.print")
-
-    starcraft.hello()
-
-    print.assert_called_once_with("Hello *craft team!")
-
-
-def test_hello_people(mocker):
-    mocker.patch("builtins.print")
-
-    starcraft.hello(["people"])
-
-    print.assert_has_calls(
-        [
-            mock.call("Hello *craft team!"),
-            mock.call("Hello people!"),
-        ],
-    )
+    assert craft_grammar.__version__ is not None
