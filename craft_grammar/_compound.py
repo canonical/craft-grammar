@@ -16,14 +16,12 @@
 
 """Compound Statement for Craft Grammar."""
 
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
 from overrides import overrides
 
+from ._base_processor import BaseProcessor
 from ._statement import CallStack, Grammar, Statement
-
-if TYPE_CHECKING:
-    from ._processor import GrammarProcessor
 
 
 class CompoundStatement(Statement):
@@ -34,7 +32,7 @@ class CompoundStatement(Statement):
         *,
         statements: list[Statement],
         body: Grammar,
-        processor: "GrammarProcessor",
+        processor: BaseProcessor,
         call_stack: CallStack | None = None,
     ) -> None:
         """Create an CompoundStatement instance.

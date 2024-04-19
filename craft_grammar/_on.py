@@ -17,15 +17,13 @@
 """On Statement for Craft Grammar."""
 
 import re
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
 from overrides import overrides
 
+from ._base_processor import BaseProcessor
 from ._statement import CallStack, Grammar, Statement
 from .errors import OnStatementSyntaxError
-
-if TYPE_CHECKING:
-    from ._processor import GrammarProcessor
 
 _SELECTOR_PATTERN = re.compile(r"\Aon\s+([^,\s](?:,?[^,]+)*)\Z")
 _WHITESPACE_PATTERN = re.compile(r"\A.*\s.*\Z")
@@ -39,7 +37,7 @@ class OnStatement(Statement):
         *,
         on_statement: str,
         body: Grammar,
-        processor: "GrammarProcessor",
+        processor: BaseProcessor,
         call_stack: CallStack | None = None,
     ) -> None:
         """Create an OnStatement instance.

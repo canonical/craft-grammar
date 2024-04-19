@@ -20,6 +20,7 @@ import re
 from collections.abc import Callable
 from typing import Any
 
+from ._base_processor import BaseProcessor
 from ._compound import CompoundStatement
 from ._on import OnStatement
 from ._statement import CallStack, Grammar, Statement
@@ -35,7 +36,7 @@ _ELSE_CLAUSE_PATTERN = re.compile(r"\Aelse\Z")
 _ELSE_FAIL_PATTERN = re.compile(r"\Aelse\s+fail\Z")
 
 
-class GrammarProcessor:  # pylint: disable=too-few-public-methods
+class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
     """The GrammarProcessor extracts desired primitives from grammar."""
 
     def __init__(
@@ -56,8 +57,7 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
                             primitive and arch, and returning a
                             transformed primitive.
         """
-        self.arch = arch
-        self.target_arch = target_arch
+        super().__init__(arch, target_arch)
         self.checker = checker
 
         if transformer:

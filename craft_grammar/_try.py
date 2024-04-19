@@ -16,15 +16,11 @@
 
 """Try Statement for Craft Grammar."""
 
-from typing import TYPE_CHECKING
 
 from overrides import overrides
 
+from ._base_processor import BaseProcessor
 from ._statement import CallStack, Grammar, Statement
-
-# Don't use circular imports unless type checking
-if TYPE_CHECKING:
-    from ._processor import GrammarProcessor
 
 
 class TryStatement(Statement):
@@ -47,7 +43,7 @@ class TryStatement(Statement):
         self,
         *,
         body: Grammar,
-        processor: "GrammarProcessor",
+        processor: BaseProcessor,
         call_stack: CallStack | None = None,
     ) -> None:
         """Create a TryStatement instance.

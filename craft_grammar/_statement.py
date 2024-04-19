@@ -17,18 +17,14 @@
 """Statement definition for Craft Grammar."""
 
 from abc import ABCMeta, abstractmethod
-from collections.abc import Iterable, Sequence
-from typing import TYPE_CHECKING, Any
+from collections.abc import Iterable
 
 from . import errors
+from ._base_processor import BaseProcessor
+from ._types import Grammar
 
-Grammar = Sequence[str | dict[str, Any]]
-"""Grammar type."""
 CallStack = list["Statement"]
 """CallStack type."""
-
-if TYPE_CHECKING:
-    from . import GrammarProcessor
 
 
 class Statement(metaclass=ABCMeta):
@@ -38,7 +34,7 @@ class Statement(metaclass=ABCMeta):
         self,
         *,
         body: Grammar,
-        processor: "GrammarProcessor",
+        processor: BaseProcessor,
         call_stack: CallStack | None,
         check_primitives: bool = False,
     ) -> None:
