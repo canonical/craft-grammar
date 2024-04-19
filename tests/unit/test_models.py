@@ -363,7 +363,7 @@ def test_grammar_nested_error():
 
     with pytest.raises(pydantic.ValidationError) as raised:
         GrammarValidation(
-            x=[
+            x=[  # pyright: ignore [reportArgumentType]
                 {"on arm64,amd64": [{"on arm64": "foo"}, {"else": [35]}]},
             ],
         )
@@ -380,7 +380,9 @@ def test_grammar_str_elsefail():
 
         x: Grammar[str]
 
-    GrammarValidation(x=[{"on arch": "foo"}, "else fail"])
+    GrammarValidation(
+        x=[{"on arch": "foo"}, "else fail"],  # pyright: ignore [reportArgumentType]
+    )
 
 
 def test_grammar_strlist_elsefail():
@@ -389,7 +391,9 @@ def test_grammar_strlist_elsefail():
 
         x: Grammar[list[str]]
 
-    GrammarValidation(x=[{"on arch": ["foo"]}, "else fail"])
+    GrammarValidation(
+        x=[{"on arch": ["foo"]}, "else fail"],  # pyright: ignore [reportArgumentType]
+    )
 
 
 def test_grammar_try():
@@ -399,7 +403,7 @@ def test_grammar_try():
         x: Grammar[str]
 
     with pytest.raises(pydantic.ValidationError) as raised:
-        GrammarValidation(x=[{"try": "foo"}])
+        GrammarValidation(x=[{"try": "foo"}])  # pyright: ignore [reportArgumentType]
 
     err = raised.value.errors()
     assert len(err) == 1
@@ -442,7 +446,7 @@ def test_grammar_errors(clause, err_msg):
         x: Grammar[str]
 
     with pytest.raises(pydantic.ValidationError) as raised:
-        GrammarValidation(x=[{clause: "foo"}])
+        GrammarValidation(x=[{clause: "foo"}])  # pyright: ignore [reportArgumentType]
 
     err = raised.value.errors()
     assert len(err) == 1
