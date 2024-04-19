@@ -68,13 +68,13 @@ class GrammarMyModel(BaseModel):
 
     str_value: Grammar[str]
     str_value_or_none: Grammar[str] | None = None
-    optional_str_value: Optional[Grammar[str]] = None
+    optional_str_value: Grammar[str] | None = None
     str_with_default: Grammar[str] = "string"
     str_or_non_with_default: Grammar[str] | None = "string or None"
-    union_value: Grammar[Union[str, int, None]] = None
+    union_value: Grammar[str] | Grammar[int] | None = None
     literal_value: Grammar[str] = "green"
     list_value: Grammar[list[int]] = []
-    other_list: Grammar[List[int]]
+    other_list: Grammar[list[int]]
     dict_value: Grammar[dict[str, bool]]
     list_of_dicts: Grammar[list[dict[str, str]]]
     sub_model: GrammarSubModel
