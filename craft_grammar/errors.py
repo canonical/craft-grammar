@@ -16,7 +16,6 @@
 
 """Errors for Craft Grammar."""
 
-from typing import Optional
 
 
 class CraftGrammarError(Exception):
@@ -33,7 +32,7 @@ class GrammarSyntaxError(CraftGrammarError):
 class OnStatementSyntaxError(GrammarSyntaxError):
     """Error raised on on statement syntax errors."""
 
-    def __init__(self, on_statement: str, *, message: Optional[str] = None):
+    def __init__(self, on_statement: str, *, message: str | None = None):
         components = [f"{on_statement!r} is not a valid 'on' clause"]
         if message:
             components.append(message)
@@ -43,7 +42,7 @@ class OnStatementSyntaxError(GrammarSyntaxError):
 class ToStatementSyntaxError(GrammarSyntaxError):
     """Error raised on to statement syntax errors."""
 
-    def __init__(self, to_statement: str, *, message: Optional[str] = None):
+    def __init__(self, to_statement: str, *, message: str | None = None):
         components = [f"{to_statement!r} is not a valid 'to' clause"]
         if message:
             components.append(message)

@@ -17,7 +17,7 @@
 """On Statement for Craft Grammar."""
 
 import re
-from typing import TYPE_CHECKING, Optional, Set
+from typing import TYPE_CHECKING
 
 from overrides import overrides
 
@@ -40,7 +40,7 @@ class OnStatement(Statement):
         on_statement: str,
         body: Grammar,
         processor: "GrammarProcessor",
-        call_stack: Optional[CallStack] = None,
+        call_stack: CallStack | None = None,
     ) -> None:
         """Create an OnStatement instance.
 
@@ -72,7 +72,7 @@ class OnStatement(Statement):
         return f"on {','.join(sorted(self.selectors))}"
 
 
-def _extract_on_clause_selectors(on_statement: str) -> Set[str]:
+def _extract_on_clause_selectors(on_statement: str) -> set[str]:
     """Extract the list of selectors within an on clause.
 
     :param str on_statement: The 'on <selector>' part of the 'on' clause.
@@ -96,7 +96,7 @@ def _extract_on_clause_selectors(on_statement: str) -> Set[str]:
     # to provide a very generic error when we can try to be more helpful.
     if _WHITESPACE_PATTERN.match(selector_group):
         raise OnStatementSyntaxError(
-            on_statement, message="spaces are not allowed in the selectors"
+            on_statement, message="spaces are not allowed in the selectors",
         )
 
     return {selector.strip() for selector in selector_group.split(",")}

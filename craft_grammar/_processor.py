@@ -17,7 +17,8 @@
 """Craft Grammar's Processor implementation."""
 
 import re
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from collections.abc import Callable
+from typing import Any
 
 from ._compound import CompoundStatement
 from ._on import OnStatement
@@ -43,7 +44,7 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
         checker: Callable[[Any], bool],
         arch: str,
         target_arch: str,
-        transformer: Optional[Callable[[List[Statement], str, str], str]] = None,
+        transformer: Callable[[list[Statement], str, str], str] | None = None,
     ) -> None:
         """Create a new GrammarProcessor.
 
@@ -66,8 +67,8 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
             self._transformer = lambda s, p, o: p
 
     def process(
-        self, *, grammar: Grammar, call_stack: Optional[CallStack] = None
-    ) -> List[Any]:
+        self, *, grammar: Grammar, call_stack: CallStack | None = None,
+    ) -> list[Any]:
         """Process grammar and extract desired primitives.
 
         :param grammar: Unprocessed grammar.
@@ -78,9 +79,9 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
         if call_stack is None:
             call_stack = []
 
-        primitives: List[Any] = []
+        primitives: list[Any] = []
         statements = _StatementCollection()
-        statement: Optional[Statement] = None
+        statement: Statement | None = None
 
         for section in grammar:
             if isinstance(section, str):
@@ -127,7 +128,7 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
                 # jsonschema should never let us get here.
                 raise GrammarSyntaxError(
                     "expected grammar section to be either of type 'str' or "
-                    f"type 'dict', but got {type(section)!r}"
+                    f"type 'dict', but got {type(section)!r}",
                 )
 
         # Process the final statement (if any).
@@ -142,9 +143,9 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
     @staticmethod
     def _process_statement(
         *,
-        statement: Optional[Statement],
+        statement: Statement | None,
         statements: "_StatementCollection",
-        primitives: List[Any],
+        primitives: list[Any],
     ):
         if statement is None:
             return
@@ -156,11 +157,11 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
     def _parse_section_dictionary(
         self,
         *,
-        section: Dict[str, Any],
-        statement: Optional[Statement],
+        section: dict[str, Any],
+        statement: Statement | None,
         call_stack: CallStack,
-    ) -> Tuple[Optional[Statement], Optional[Statement]]:
-        finalized_statement: Optional[Statement] = None
+    ) -> tuple[Statement | None, Statement | None]:
+        finalized_statement: Statement | None = None
         for key, value in section.items():
             # Grammar is always written as a list of selectors but the value
             # can be a list or a string. In the latter case we wrap it so no
@@ -236,7 +237,7 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
                 finalized_statement = statement
 
                 statement = TryStatement(
-                    body=value, processor=self, call_stack=call_stack
+                    body=value, processor=self, call_stack=call_stack,
                 )
 
             elif _ELSE_CLAUSE_PATTERN.match(key):
@@ -252,7 +253,7 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
         return statement, finalized_statement
 
 
-def _handle_else(statement: Optional[Statement], else_body: Optional[Grammar]):
+def _handle_else(statement: Statement | None, else_body: Grammar | None):
     """Add else body to current statement.
 
     :param statement: The currently-active statement. If None it will be
@@ -264,7 +265,7 @@ def _handle_else(statement: Optional[Statement], else_body: Optional[Grammar]):
     """
     if statement is None:
         raise GrammarSyntaxError(
-            "'else' doesn't seem to correspond to an 'on' or 'try'"
+            "'else' doesn't seem to correspond to an 'on' or 'try'",
         )
 
     statement.add_else(else_body)
@@ -274,9 +275,9 @@ class _StatementCollection:  # pylint: disable=too-few-public-methods
     """Unique collection of statements to run at a later time."""
 
     def __init__(self) -> None:
-        self._statements: List[Statement] = []
+        self._statements: list[Statement] = []
 
-    def add(self, statement: Optional[Statement]) -> None:
+    def add(self, statement: Statement | None) -> None:
         """Add new statement to collection.
 
         :param statement: New statement.
@@ -288,7 +289,7 @@ class _StatementCollection:  # pylint: disable=too-few-public-methods
 
         if statement in self._statements:
             raise GrammarSyntaxError(
-                f"found duplicate {str(statement)!r} statements. These should be merged."
+                f"found duplicate {str(statement)!r} statements. These should be merged.",
             )
 
         self._statements.append(statement)

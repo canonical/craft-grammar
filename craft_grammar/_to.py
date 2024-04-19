@@ -17,7 +17,7 @@
 """To Statement for Craft Grammar."""
 
 import re
-from typing import TYPE_CHECKING, Optional, Set
+from typing import TYPE_CHECKING
 
 from overrides import overrides
 
@@ -40,7 +40,7 @@ class ToStatement(Statement):
         to_statement: str,
         body: Grammar,
         processor: "GrammarProcessor",
-        call_stack: Optional[CallStack] = None,
+        call_stack: CallStack | None = None,
     ) -> None:
         """Create a ToStatement instance.
 
@@ -74,7 +74,7 @@ class ToStatement(Statement):
         return f"to {', '.join(sorted(self.selectors))}"
 
 
-def _extract_to_clause_selectors(to_statement: str) -> Set[str]:
+def _extract_to_clause_selectors(to_statement: str) -> set[str]:
     """Extract the list of selectors within a to clause.
 
     :param to_statement: The 'to <selector>' part of the 'to' clause.
@@ -98,7 +98,7 @@ def _extract_to_clause_selectors(to_statement: str) -> Set[str]:
     # to provide a very generic error when we can try to be more helpful.
     if _WHITESPACE_PATTERN.match(selector_group):
         raise ToStatementSyntaxError(
-            to_statement, message="spaces are not allowed in the selectors"
+            to_statement, message="spaces are not allowed in the selectors",
         )
 
     return {selector.strip() for selector in selector_group.split(",")}

@@ -18,7 +18,7 @@
 
 import abc
 import re
-from typing import Any, Generic, List, TypeVar, get_args, get_origin
+from typing import Any, Generic, TypeVar, get_args, get_origin
 
 from overrides import overrides
 from pydantic import BaseConfig, PydanticTypeError
@@ -47,7 +47,7 @@ class _GrammarBase(abc.ABC):
         """Ensure the given entry is valid type or grammar."""
 
     @classmethod
-    def _grammar_append(cls, entry: List, item: Any) -> None:
+    def _grammar_append(cls, entry: list, item: Any) -> None:
         if item == _ELSE_FAIL:
             _mark_and_append(entry, item)
         else:
@@ -110,12 +110,10 @@ class GrammarMetaClass(type):
                         # Check if the item is a valid grammar clause
                         if _is_grammar_clause(item):
                             cls._grammar_append(new_entry, item)
+                        elif sub_type and isinstance(item, sub_type):
+                            new_entry.append(item)
                         else:
-                            # Check if the item is a valid type if not a grammar clause
-                            if sub_type and isinstance(item, sub_type):
-                                new_entry.append(item)
-                            else:
-                                raise TypeError(_format_type_error(type_, entry))
+                            raise TypeError(_format_type_error(type_, entry))
 
                     return new_entry
 
@@ -205,7 +203,7 @@ def _is_grammar_clause(item: Any) -> bool:  # pylint: disable=too-many-return-st
     return False
 
 
-def _mark_and_append(entry: List, item: Any) -> None:
+def _mark_and_append(entry: list, item: Any) -> None:
     """Mark entry as parsed for testing and debug."""
     if isinstance(item, str):
         entry.append("*" + item)

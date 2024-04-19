@@ -32,7 +32,7 @@ CONFIG_TEMPLATE = """
 """
 
 
-def create_grammar_model(model_class: typing.Type[BaseModel]) -> str:
+def create_grammar_model(model_class: type[BaseModel]) -> str:
     """Create the code for a grammar-aware class compatible with ``model_class``.
 
     :param model_class: A pydantic.BaseModel subclass.
@@ -50,7 +50,7 @@ def create_grammar_model(model_class: typing.Type[BaseModel]) -> str:
 
         if grammar_type is None:
             logger.debug(
-                "Skipping unknown type %s for attribute %s", attr_type, attr_name
+                "Skipping unknown type %s for attribute %s", attr_type, attr_name,
             )
             continue
 

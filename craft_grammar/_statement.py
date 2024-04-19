@@ -17,13 +17,14 @@
 """Statement definition for Craft Grammar."""
 
 from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Optional, Sequence, Union
+from collections.abc import Iterable, Sequence
+from typing import TYPE_CHECKING, Any
 
 from . import errors
 
-Grammar = Sequence[Union[str, Dict[str, Any]]]
+Grammar = Sequence[str | dict[str, Any]]
 """Grammar type."""
-CallStack = List["Statement"]
+CallStack = list["Statement"]
 """CallStack type."""
 
 if TYPE_CHECKING:
@@ -38,8 +39,8 @@ class Statement(metaclass=ABCMeta):
         *,
         body: Grammar,
         processor: "GrammarProcessor",
-        call_stack: Optional[CallStack],
-        check_primitives: bool = False
+        call_stack: CallStack | None,
+        check_primitives: bool = False,
     ) -> None:
         """Create an Statement instance.
 
@@ -60,12 +61,12 @@ class Statement(metaclass=ABCMeta):
         self._body = body
         self._processor = processor
         self._check_primitives = check_primitives
-        self._else_bodies: List[Optional[Grammar]] = []
+        self._else_bodies: list[Grammar | None] = []
 
-        self.__processed_body: Optional[List[str]] = None
-        self.__processed_else: Optional[List[str]] = None
+        self.__processed_body: list[str] | None = None
+        self.__processed_else: list[str] | None = None
 
-    def add_else(self, else_body: Optional[Grammar]) -> None:
+    def add_else(self, else_body: Grammar | None) -> None:
         """Add an 'else' clause to the statement.
 
         :param list else_body: The body of an 'else' clause.
@@ -74,7 +75,7 @@ class Statement(metaclass=ABCMeta):
         """
         self._else_bodies.append(else_body)
 
-    def process(self) -> List[str]:
+    def process(self) -> list[str]:
         """Process this statement.
 
         :return: Primitives as determined by evaluating the statement or its
@@ -87,19 +88,19 @@ class Statement(metaclass=ABCMeta):
 
         return primitives
 
-    def _process_body(self) -> List[str]:
+    def _process_body(self) -> list[str]:
         """Process the main body of this statement.
 
         :return: Primitives as determined by processing the main body.
         """
         if self.__processed_body is None:
             self.__processed_body = self._processor.process(
-                grammar=self._body, call_stack=self._call_stack(include_self=True)
+                grammar=self._body, call_stack=self._call_stack(include_self=True),
             )
 
         return self.__processed_body
 
-    def _process_else(self) -> List[str]:
+    def _process_else(self) -> list[str]:
         """Process the else clauses of this statement in order.
 
         :return: Primitives as determined by processing the else clauses.
@@ -114,12 +115,12 @@ class Statement(metaclass=ABCMeta):
                 raise errors.UnsatisfiedStatementError(str(self))
 
             processed_else = self._processor.process(
-                grammar=else_body, call_stack=self._call_stack()
+                grammar=else_body, call_stack=self._call_stack(),
             )
             if processed_else:
                 self.__processed_else = processed_else
                 if not self._check_primitives or self._validate_primitives(
-                    processed_else
+                    processed_else,
                 ):
                     break
 

@@ -16,7 +16,7 @@
 
 """Compound Statement for Craft Grammar."""
 
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING
 
 from overrides import overrides
 
@@ -32,10 +32,10 @@ class CompoundStatement(Statement):
     def __init__(
         self,
         *,
-        statements: List[Statement],
+        statements: list[Statement],
         body: Grammar,
         processor: "GrammarProcessor",
-        call_stack: Optional[CallStack] = None,
+        call_stack: CallStack | None = None,
     ) -> None:
         """Create an CompoundStatement instance.
 

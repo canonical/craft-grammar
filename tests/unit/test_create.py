@@ -15,11 +15,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import annotations
 
-from typing import List, Literal, Optional, Union
-
-from pydantic import BaseModel, Field
+from typing import Literal
 
 from craft_grammar import create_grammar_model
+from pydantic import BaseModel, Field
 
 
 class SubModel(BaseModel):
@@ -32,15 +31,15 @@ class MyModel(BaseModel):
     # Primitive types
     str_value: str
     str_value_or_none: str | None
-    optional_str_value: Optional[str]
+    optional_str_value: str | None
     str_with_default: str = "string"
     str_or_non_with_default: str | None = "string or None"
-    union_value: Union[str, int, None]
+    union_value: str | int | None
     literal_value: Literal["red", "green", "blue"] = "green"
 
     # Collections
     list_value: list[int] = []
-    other_list: List[int]
+    other_list: list[int]
     dict_value: dict[str, bool]
     list_of_dicts: list[dict[str, str]]
 
