@@ -1,5 +1,1 @@
-Sphinx~=7.3
-sphinx-autodoc-typehints~=2.1
-sphinx-jsonschema~=1.19
-sphinx-pydantic~=0.1
-sphinx-rtd-theme~=2.0
+.[docs]
