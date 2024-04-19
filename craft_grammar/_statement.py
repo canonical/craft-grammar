@@ -81,12 +81,7 @@ class Statement(metaclass=ABCMeta):
         :return: Primitives as determined by evaluating the statement or its
                  else clauses.
         """
-        if self.check():
-            primitives = self._process_body()
-        else:
-            primitives = self._process_else()
-
-        return primitives
+        return self._process_body() if self.check() else self._process_else()
 
     def _process_body(self) -> list[str]:
         """Process the main body of this statement.
@@ -136,10 +131,7 @@ class Statement(metaclass=ABCMeta):
         :return: Whether or not all primitives are valid.
         :rtype: bool
         """
-        for primitive in primitives:
-            if not self._processor.checker(primitive):
-                return False
-        return True
+        return all(self._processor.checker(primitive) for primitive in primitives)
 
     def _call_stack(self, *, include_self: bool = False) -> CallStack:
         """Return call stack when processing this statement.

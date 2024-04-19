@@ -50,11 +50,7 @@ class CompoundStatement(Statement):
 
     @overrides
     def check(self) -> bool:
-        for statement in self.statements:
-            if not statement.check():
-                return False
-
-        return True
+        return all(statement.check() for statement in self.statements)
 
     def __eq__(self, other: object) -> bool:
         if type(other) is type(self):

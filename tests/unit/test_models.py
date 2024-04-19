@@ -326,7 +326,7 @@ def test_grammar_str_error(value):
         x: Grammar[str]
 
     with pytest.raises(pydantic.ValidationError) as raised:
-        GrammarValidation(x=value)  # type: ignore
+        GrammarValidation(x=value)
 
     err = raised.value.errors()
     assert len(err) == 1
@@ -346,7 +346,7 @@ def test_grammar_strlist_error(value):
         x: Grammar[list[str]]
 
     with pytest.raises(pydantic.ValidationError) as raised:
-        GrammarValidation(x=value)  # type: ignore
+        GrammarValidation(x=value)
 
     err = raised.value.errors()
     assert len(err) == 1
@@ -365,7 +365,7 @@ def test_grammar_nested_error():
         GrammarValidation(
             x=[
                 {"on arm64,amd64": [{"on arm64": "foo"}, {"else": [35]}]},
-            ],  # type: ignore
+            ],
         )
     err = raised.value.errors()
     assert len(err) == 1
@@ -380,7 +380,7 @@ def test_grammar_str_elsefail():
 
         x: Grammar[str]
 
-    GrammarValidation(x=[{"on arch": "foo"}, "else fail"])  # type: ignore
+    GrammarValidation(x=[{"on arch": "foo"}, "else fail"])
 
 
 def test_grammar_strlist_elsefail():
@@ -389,7 +389,7 @@ def test_grammar_strlist_elsefail():
 
         x: Grammar[list[str]]
 
-    GrammarValidation(x=[{"on arch": ["foo"]}, "else fail"])  # type: ignore
+    GrammarValidation(x=[{"on arch": ["foo"]}, "else fail"])
 
 
 def test_grammar_try():
@@ -399,7 +399,7 @@ def test_grammar_try():
         x: Grammar[str]
 
     with pytest.raises(pydantic.ValidationError) as raised:
-        GrammarValidation(x=[{"try": "foo"}])  # type: ignore
+        GrammarValidation(x=[{"try": "foo"}])
 
     err = raised.value.errors()
     assert len(err) == 1
@@ -409,7 +409,7 @@ def test_grammar_try():
 
 
 @pytest.mark.parametrize(
-    "clause,err_msg",
+    ("clause", "err_msg"),
     [
         ("on", "value must be a str: [{'on': 'foo'}]"),
         ("on ,", "syntax error in 'on' selector"),
@@ -442,7 +442,7 @@ def test_grammar_errors(clause, err_msg):
         x: Grammar[str]
 
     with pytest.raises(pydantic.ValidationError) as raised:
-        GrammarValidation(x=[{clause: "foo"}])  # type: ignore
+        GrammarValidation(x=[{clause: "foo"}])
 
     err = raised.value.errors()
     assert len(err) == 1

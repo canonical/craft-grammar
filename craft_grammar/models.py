@@ -16,6 +16,8 @@
 
 """Pydantic models for grammar."""
 
+# ruff: noqa: ANN401 (lots of Anys in this module)
+
 import abc
 import re
 from collections.abc import Callable, Iterator
@@ -71,7 +73,7 @@ def _format_type_error(type_: type, entry: Any) -> str:
         return f"value must be a list: {entry!r}"
 
     if issubclass(origin, dict):
-        if len(args) == 2:
+        if len(args) == 2:  # noqa: PLR2004
             return f"value must be a dict of {args[0].__name__} to {args[1].__name__}: {entry!r}"
         return f"value must be a dict: {entry!r}"
 
@@ -163,7 +165,7 @@ def _ensure_selector_valid(selector: str, *, clause: str) -> None:
         raise ValueError(f"syntax error in {clause!r} selector")
 
 
-def _is_grammar_clause(item: Any) -> bool:  # pylint: disable=too-many-return-statements
+def _is_grammar_clause(item: Any) -> bool:  # noqa: PLR0911
     """Check if the given item is a valid grammar clause."""
     # The 'else fail' clause is a string.
     if item == _ELSE_FAIL:

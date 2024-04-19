@@ -74,15 +74,14 @@ def create_grammar_model(model_class: type[BaseModel]) -> str:
 
         attributes.append(attr_decl)
 
-    lines = [class_decl] + CONFIG_TEMPLATE.split("\n")
-    for attr in attributes:
-        lines.append(f"    {attr}")
+    lines = [class_decl, *CONFIG_TEMPLATE.split("\n")]
+    lines.extend(f"    {attr}" for attr in attributes)
     lines.append("")  # Final newline
 
     return "\n".join(lines)
 
 
-def _get_grammar_type_for(model_type: type) -> str | None:
+def _get_grammar_type_for(model_type: type) -> str | None:  # noqa: PLR0911
     """Get the "grammar" type for ``model_type``.
 
     Returns None if we don't know how to "grammify" ``model_type``.
@@ -105,7 +104,7 @@ def _get_grammar_type_for(model_type: type) -> str | None:
 
         case typing.Union:
             # Type is either a Union[] or an Optional[]
-            if len(args) == 2 and type(None) in args:
+            if len(args) == 2 and type(None) in args:  # noqa: PLR2004
                 # Type is an Optional[]
                 # Optional[T] -> Optional[Grammar[T]]
                 other_type = [t for t in args if t is not type(None)][0]
@@ -116,11 +115,7 @@ def _get_grammar_type_for(model_type: type) -> str | None:
             union_args = []
             for arg in typing.get_args(model_type):
                 if typing.get_origin(arg) is None:
-                    if arg is type(None):
-                        name = "None"
-                    else:
-                        # print int as "int"
-                        name = arg.__name__
+                    name = "None" if arg is type(None) else arg.__name__
                     union_args.append(name)
                 else:
                     # print dict[k, v] as "dict[k,v]"
@@ -142,7 +137,7 @@ def _get_grammar_type_for(model_type: type) -> str | None:
 
         case typing.Literal:
             # Literal["a", "b"] -> Grammar[str]
-            arg_types = set(type(a) for a in typing.get_args(model_type))
+            arg_types = {type(a) for a in typing.get_args(model_type)}
             if len(arg_types) == 1:
                 # For now only handle the case where all possible literal values
                 # have the same type

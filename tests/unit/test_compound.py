@@ -213,7 +213,7 @@ error_scenarios = [
 
 @pytest.mark.parametrize("scenario", error_scenarios)
 def test_errors(scenario):
-    with pytest.raises(scenario["expected_exception"]) as grammar_error:
+    with pytest.raises(scenario["expected_exception"]) as grammar_error:  # noqa: PT012
         processor = GrammarProcessor(
             arch="amd64",
             target_arch="armhf",

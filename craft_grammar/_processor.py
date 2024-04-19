@@ -64,7 +64,7 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
             self._transformer = transformer
         else:
             # By default, no transformation
-            self._transformer = lambda s, p, o: p
+            self._transformer = lambda _s, p, _o: p
 
     def process(
         self,
@@ -165,11 +165,12 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
         call_stack: CallStack,
     ) -> tuple[Statement | None, Statement | None]:
         finalized_statement: Statement | None = None
-        for key, value in section.items():
+        for key, value_ in section.items():
             # Grammar is always written as a list of selectors but the value
             # can be a list or a string. In the latter case we wrap it so no
             # special care needs to be taken when fetching the result from the
             # primitive.
+            value = value_
             if not isinstance(value, list):
                 value = [value]
 
@@ -221,7 +222,7 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
                     call_stack=call_stack,
                 )
 
-            # TODO remove support for to without on (this statement)
+            # to-do: remove support for to without on (this statement)
             elif _TO_CLAUSE_PATTERN.match(key):
                 # We've come across the beginning of a 'to' statement.
                 # That means any previous statement we found is complete.

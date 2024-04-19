@@ -309,9 +309,11 @@ transformer_scenarios = [
 def test_grammar_with_transformer(scenario):
     # Transform all 'to' statements to include arch
     def transformer(call_stack, package_name, target_arch):
-        if any(isinstance(s, ToStatement) for s in call_stack):
-            if ":" not in package_name:
-                package_name = f"{package_name}:{target_arch}"
+        if (
+            any(isinstance(s, ToStatement) for s in call_stack)
+            and ":" not in package_name
+        ):
+            package_name = f"{package_name}:{target_arch}"
 
         return package_name
 
