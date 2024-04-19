@@ -17,7 +17,7 @@
 """On Statement for Craft Grammar."""
 
 import re
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from overrides import overrides
 
@@ -62,9 +62,9 @@ class OnStatement(Statement):
         # selector.
         return (len(self.selectors) == 1) and (self._processor.arch in self.selectors)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if type(other) is type(self):
-            return self.selectors == other.selectors
+            return cast(bool, self.selectors == other.selectors)
 
         return False
 

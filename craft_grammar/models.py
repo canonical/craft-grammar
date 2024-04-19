@@ -18,6 +18,7 @@
 
 import abc
 import re
+from collections.abc import Callable, Iterator
 from typing import Any, Generic, TypeVar, get_args, get_origin
 
 from overrides import overrides
@@ -38,16 +39,16 @@ T = TypeVar("T")
 
 class _GrammarBase(abc.ABC):
     @classmethod
-    def __get_validators__(cls):
+    def __get_validators__(cls) -> Iterator[Callable[[Any], Any]]:
         yield cls.validate
 
     @classmethod
     @abc.abstractmethod
-    def validate(cls, entry):
+    def validate(cls, entry: Any) -> Any:
         """Ensure the given entry is valid type or grammar."""
 
     @classmethod
-    def _grammar_append(cls, entry: list, item: Any) -> None:
+    def _grammar_append(cls, entry: list[Any], item: Any) -> None:
         if item == _ELSE_FAIL:
             _mark_and_append(entry, item)
         else:
@@ -84,7 +85,7 @@ class GrammarMetaClass(type):
     """
 
     # Define __getitem__ method to be able to use index
-    def __getitem__(cls, type_):
+    def __getitem__(cls, type_: Any) -> Any:
         class GrammarScalar(_GrammarBase):
             """Grammar scalar class.
 
@@ -93,11 +94,11 @@ class GrammarMetaClass(type):
 
             @classmethod
             @overrides
-            def validate(cls, entry):
+            def validate(cls, entry: Any) -> Any:
                 # Grammar[T] entry can be a list if it contains clauses
                 if isinstance(entry, list):
                     # Check if the type_ supposed to be a list
-                    sub_type = get_args(type_)
+                    sub_type: Any = get_args(type_)
 
                     # handle typed list
                     if sub_type:
@@ -105,7 +106,7 @@ class GrammarMetaClass(type):
                         if sub_type is Any:
                             sub_type = None
 
-                    new_entry = []
+                    new_entry: list[Any] = []
                     for item in entry:
                         # Check if the item is a valid grammar clause
                         if _is_grammar_clause(item):
@@ -203,7 +204,7 @@ def _is_grammar_clause(item: Any) -> bool:  # pylint: disable=too-many-return-st
     return False
 
 
-def _mark_and_append(entry: list, item: Any) -> None:
+def _mark_and_append(entry: list[Any], item: Any) -> None:
     """Mark entry as parsed for testing and debug."""
     if isinstance(item, str):
         entry.append("*" + item)

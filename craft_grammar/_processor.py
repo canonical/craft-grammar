@@ -149,7 +149,7 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
         statement: Statement | None,
         statements: "_StatementCollection",
         primitives: list[Any],
-    ):
+    ) -> None:
         if statement is None:
             return
 
@@ -258,7 +258,7 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
         return statement, finalized_statement
 
 
-def _handle_else(statement: Statement | None, else_body: Grammar | None):
+def _handle_else(statement: Statement | None, else_body: Grammar | None) -> None:
     """Add else body to current statement.
 
     :param statement: The currently-active statement. If None it will be

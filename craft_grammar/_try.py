@@ -68,7 +68,7 @@ class TryStatement(Statement):
     def check(self) -> bool:
         return self._validate_primitives(self._process_body())
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         return False
 
     def __str__(self) -> str:

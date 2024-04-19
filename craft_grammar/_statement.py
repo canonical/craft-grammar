@@ -141,7 +141,7 @@ class Statement(metaclass=ABCMeta):
                 return False
         return True
 
-    def _call_stack(self, *, include_self=False) -> CallStack:
+    def _call_stack(self, *, include_self: bool = False) -> CallStack:
         """Return call stack when processing this statement.
 
         :param bool include_self: Whether or not this statement should be
@@ -153,7 +153,7 @@ class Statement(metaclass=ABCMeta):
 
         return call_stack
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "{self.__str__()!r}"
 
     @abstractmethod
@@ -165,7 +165,7 @@ class Statement(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Return if a statement is equal to another."""
 
     @abstractmethod

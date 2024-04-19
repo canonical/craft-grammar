@@ -16,7 +16,7 @@
 
 """Compound Statement for Craft Grammar."""
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from overrides import overrides
 
@@ -56,9 +56,9 @@ class CompoundStatement(Statement):
 
         return True
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if type(other) is type(self):
-            return self.statements == other.statements
+            return cast(bool, self.statements == other.statements)
 
         return False
 

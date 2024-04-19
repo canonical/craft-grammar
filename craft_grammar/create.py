@@ -82,7 +82,7 @@ def create_grammar_model(model_class: type[BaseModel]) -> str:
     return "\n".join(lines)
 
 
-def _get_grammar_type_for(model_type) -> str | None:  # pylint: disable=R0911,R0912
+def _get_grammar_type_for(model_type: type) -> str | None:
     """Get the "grammar" type for ``model_type``.
 
     Returns None if we don't know how to "grammify" ``model_type``.
