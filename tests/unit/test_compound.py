@@ -159,7 +159,6 @@ scenarios = [
 
 @pytest.mark.parametrize("scenario", scenarios)
 def test_compound_statement(scenario):
-
     processor = GrammarProcessor(
         arch=scenario["arch"],
         target_arch="armhf",

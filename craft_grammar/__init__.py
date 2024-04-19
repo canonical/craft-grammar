@@ -17,7 +17,7 @@
 
 """Enhance part definitions with advanced grammar."""
 
-__version__ = "1.1.2"
+__version__ = "1.2.0"
 
 
 from . import errors
@@ -27,6 +27,7 @@ from ._processor import GrammarProcessor
 from ._statement import CallStack, Grammar, Statement
 from ._to import ToStatement
 from ._try import TryStatement
+from .create import create_grammar_model
 
 __all__ = [
     "errors",
@@ -38,4 +39,5 @@ __all__ = [
     "Statement",
     "ToStatement",
     "TryStatement",
+    "create_grammar_model",
 ]
