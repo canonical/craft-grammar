@@ -66,7 +66,7 @@ class ToStatement(Statement):
 
     def __eq__(self, other: object) -> bool:
         if type(other) is type(self):
-            return cast(bool, self.selectors == other.selectors)
+            return self.selectors == cast(ToStatement, other).selectors
 
         return False
 

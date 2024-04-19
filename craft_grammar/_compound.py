@@ -54,7 +54,7 @@ class CompoundStatement(Statement):
 
     def __eq__(self, other: object) -> bool:
         if type(other) is type(self):
-            return cast(bool, self.statements == other.statements)
+            return self.statements == cast(CompoundStatement, other).statements
 
         return False
 
