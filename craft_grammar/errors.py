@@ -17,7 +17,6 @@
 """Errors for Craft Grammar."""
 
 
-
 class CraftGrammarError(Exception):
     """Base class error for craft-grammar."""
 

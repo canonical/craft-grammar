@@ -67,7 +67,10 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
             self._transformer = lambda s, p, o: p
 
     def process(
-        self, *, grammar: Grammar, call_stack: CallStack | None = None,
+        self,
+        *,
+        grammar: Grammar,
+        call_stack: CallStack | None = None,
     ) -> list[Any]:
         """Process grammar and extract desired primitives.
 
@@ -237,7 +240,9 @@ class GrammarProcessor:  # pylint: disable=too-few-public-methods
                 finalized_statement = statement
 
                 statement = TryStatement(
-                    body=value, processor=self, call_stack=call_stack,
+                    body=value,
+                    processor=self,
+                    call_stack=call_stack,
                 )
 
             elif _ELSE_CLAUSE_PATTERN.match(key):

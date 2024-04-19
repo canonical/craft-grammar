@@ -58,7 +58,10 @@ class TryStatement(Statement):
         :param call_stack: Call stack leading to this statement.
         """
         super().__init__(
-            body=body, processor=processor, call_stack=call_stack, check_primitives=True,
+            body=body,
+            processor=processor,
+            call_stack=call_stack,
+            check_primitives=True,
         )
 
     @overrides

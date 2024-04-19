@@ -95,7 +95,8 @@ class Statement(metaclass=ABCMeta):
         """
         if self.__processed_body is None:
             self.__processed_body = self._processor.process(
-                grammar=self._body, call_stack=self._call_stack(include_self=True),
+                grammar=self._body,
+                call_stack=self._call_stack(include_self=True),
             )
 
         return self.__processed_body
@@ -115,7 +116,8 @@ class Statement(metaclass=ABCMeta):
                 raise errors.UnsatisfiedStatementError(str(self))
 
             processed_else = self._processor.process(
-                grammar=else_body, call_stack=self._call_stack(),
+                grammar=else_body,
+                call_stack=self._call_stack(),
             )
             if processed_else:
                 self.__processed_else = processed_else

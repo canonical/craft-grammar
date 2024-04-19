@@ -50,7 +50,9 @@ def create_grammar_model(model_class: type[BaseModel]) -> str:
 
         if grammar_type is None:
             logger.debug(
-                "Skipping unknown type %s for attribute %s", attr_type, attr_name,
+                "Skipping unknown type %s for attribute %s",
+                attr_type,
+                attr_name,
             )
             continue
 

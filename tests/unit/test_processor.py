@@ -32,7 +32,9 @@ def test_duplicates(entry):
     """Test that multiple identical selector sets is an error."""
 
     processor = GrammarProcessor(
-        arch="amd64", target_arch="amd64", checker=lambda x: True,
+        arch="amd64",
+        target_arch="amd64",
+        checker=lambda x: True,
     )
     with pytest.raises(errors.GrammarSyntaxError) as error:
         processor.process(grammar=entry)
@@ -343,7 +345,9 @@ error_scenarios = [
 @pytest.mark.parametrize("scenario", error_scenarios)
 def test_invalid_grammar(scenario):
     processor = GrammarProcessor(
-        arch="amd64", target_arch="amd64", checker=lambda x: True,
+        arch="amd64",
+        target_arch="amd64",
+        checker=lambda x: True,
     )
 
     with pytest.raises(errors.GrammarSyntaxError) as error:

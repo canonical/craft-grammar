@@ -165,14 +165,20 @@ def test_compound_statement(scenario):
     )
     statements = [
         OnStatement(
-            on_statement=scenario["on_arch"], body=scenario["body"], processor=processor,
+            on_statement=scenario["on_arch"],
+            body=scenario["body"],
+            processor=processor,
         ),
         ToStatement(
-            to_statement=scenario["to_arch"], body=scenario["body"], processor=processor,
+            to_statement=scenario["to_arch"],
+            body=scenario["body"],
+            processor=processor,
         ),
     ]
     statement = CompoundStatement(
-        statements=statements, body=scenario["body"], processor=processor,
+        statements=statements,
+        body=scenario["body"],
+        processor=processor,
     )
 
     for else_body in scenario["else_bodies"]:
@@ -226,7 +232,9 @@ def test_errors(scenario):
             ),
         ]
         statement = CompoundStatement(
-            statements=statements, body=scenario["body"], processor=processor,
+            statements=statements,
+            body=scenario["body"],
+            processor=processor,
         )
 
         for else_body in scenario["else_bodies"]:

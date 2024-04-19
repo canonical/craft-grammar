@@ -23,7 +23,9 @@ from craft_grammar import GrammarProcessor, OnStatement, errors
 
 def test_on():
     processor = GrammarProcessor(
-        checker=lambda x: True, arch="amd64", target_arch="amd64",
+        checker=lambda x: True,
+        arch="amd64",
+        target_arch="amd64",
     )
 
     clause = OnStatement(on_statement="on amd64", body=["foo"], processor=processor)
@@ -32,7 +34,9 @@ def test_on():
 
 def test_on_else():
     processor = GrammarProcessor(
-        checker=lambda x: True, arch="amd64", target_arch="amd64",
+        checker=lambda x: True,
+        arch="amd64",
+        target_arch="amd64",
     )
 
     clause = OnStatement(on_statement="on arm64", body=["foo"], processor=processor)
@@ -42,7 +46,9 @@ def test_on_else():
 
 def test_on_else_fail():
     processor = GrammarProcessor(
-        checker=lambda x: True, arch="amd64", target_arch="amd64",
+        checker=lambda x: True,
+        arch="amd64",
+        target_arch="amd64",
     )
 
     clause = OnStatement(on_statement="on arm64", body=["foo"], processor=processor)
@@ -53,7 +59,9 @@ def test_on_else_fail():
 
 def test_on_nested_else_with_valid_on_else():
     processor = GrammarProcessor(
-        checker=lambda x: True, arch="arm64", target_arch="amd64",
+        checker=lambda x: True,
+        arch="arm64",
+        target_arch="amd64",
     )
 
     clause = OnStatement(on_statement="on amd64", body=["foo"], processor=processor)
@@ -64,7 +72,9 @@ def test_on_nested_else_with_valid_on_else():
 
 def test_on_nested_else_with_on_but_valid_else():
     processor = GrammarProcessor(
-        checker=lambda x: True, arch="i386", target_arch="i386",
+        checker=lambda x: True,
+        arch="i386",
+        target_arch="i386",
     )
 
     clause = OnStatement(on_statement="on amd64", body=["foo"], processor=processor)
@@ -75,7 +85,9 @@ def test_on_nested_else_with_on_but_valid_else():
 
 def test_on_missing():
     processor = GrammarProcessor(
-        checker=lambda x: True, arch="amd64", target_arch="amd64",
+        checker=lambda x: True,
+        arch="amd64",
+        target_arch="amd64",
     )
 
     with pytest.raises(errors.OnStatementSyntaxError):
@@ -136,10 +148,14 @@ error_scenarios = [
 def test_errors(scenario):
     with pytest.raises(errors.OnStatementSyntaxError) as syntax_error:
         processor = GrammarProcessor(
-            arch="amd64", target_arch="amd64", checker=lambda x: "invalid" not in x,
+            arch="amd64",
+            target_arch="amd64",
+            checker=lambda x: "invalid" not in x,
         )
         statement = OnStatement(
-            on_statement=scenario["on_arch"], body=scenario["body"], processor=processor,
+            on_statement=scenario["on_arch"],
+            body=scenario["body"],
+            processor=processor,
         )
 
         for else_body in scenario["else_bodies"]:
