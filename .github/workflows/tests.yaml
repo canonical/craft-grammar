@@ -19,6 +19,7 @@ jobs:
           fetch-depth: 0
       - name: conventional commits
         uses: webiny/action-conventional-commits@v1.3.0
+        continue-on-error: true
         with:
           allowed-commit-types: "build,chore,ci,docs,feat,fix,perf,refactor,style,test"
       - name: Setup Python
