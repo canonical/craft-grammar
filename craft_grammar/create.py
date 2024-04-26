@@ -81,7 +81,9 @@ def create_grammar_model(model_class: type[BaseModel]) -> str:
     return "\n".join(lines)
 
 
-def _get_grammar_type_for(model_type: type) -> str | None:  # noqa: PLR0911
+def _get_grammar_type_for(  # noqa: PLR0911 (too-many-return-statements)
+    model_type: type,
+) -> str | None:
     """Get the "grammar" type for ``model_type``.
 
     Returns None if we don't know how to "grammify" ``model_type``.
@@ -104,7 +106,7 @@ def _get_grammar_type_for(model_type: type) -> str | None:  # noqa: PLR0911
 
         case typing.Union:
             # Type is either a Union[] or an Optional[]
-            if len(args) == 2 and type(None) in args:  # noqa: PLR2004
+            if len(args) == 2 and type(None) in args:  # noqa: PLR2004 (magic value)
                 # Type is an Optional[]
                 # Optional[T] -> Optional[Grammar[T]]
                 other_type = [t for t in args if t is not type(None)][0]

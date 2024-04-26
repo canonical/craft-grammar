@@ -36,7 +36,7 @@ class BaseProcessor(abc.ABC):
         self,
         *,
         grammar: Grammar,
-        call_stack: Any | None = None,  # noqa: ANN401
+        call_stack: Any | None = None,  # noqa: ANN401 (any-type)
     ) -> list[Any]:
         """Process grammar and extract desired primitives.
 

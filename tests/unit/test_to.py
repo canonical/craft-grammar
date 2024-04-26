@@ -146,7 +146,9 @@ error_scenarios = [
 
 @pytest.mark.parametrize("scenario", error_scenarios)
 def test_errors(scenario):
-    with pytest.raises(errors.ToStatementSyntaxError) as syntax_error:  # noqa: PT012
+    with pytest.raises(  # noqa: PT012 (pytest-raises-with-multiple-statements)
+        errors.ToStatementSyntaxError,
+    ) as syntax_error:
         processor = GrammarProcessor(
             arch="amd64",
             target_arch="amd64",
