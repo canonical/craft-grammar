@@ -16,14 +16,12 @@
 
 """Compound Statement for Craft Grammar."""
 
-from typing import TYPE_CHECKING, List, Optional
+from typing import cast
 
 from overrides import overrides
 
+from ._base_processor import BaseProcessor
 from ._statement import CallStack, Grammar, Statement
-
-if TYPE_CHECKING:
-    from ._processor import GrammarProcessor
 
 
 class CompoundStatement(Statement):
@@ -32,10 +30,10 @@ class CompoundStatement(Statement):
     def __init__(
         self,
         *,
-        statements: List[Statement],
+        statements: list[Statement],
         body: Grammar,
-        processor: "GrammarProcessor",
-        call_stack: Optional[CallStack] = None,
+        processor: BaseProcessor,
+        call_stack: CallStack | None = None,
     ) -> None:
         """Create an CompoundStatement instance.
 
@@ -50,15 +48,11 @@ class CompoundStatement(Statement):
 
     @overrides
     def check(self) -> bool:
-        for statement in self.statements:
-            if not statement.check():
-                return False
+        return all(statement.check() for statement in self.statements)
 
-        return True
-
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if type(other) is type(self):
-            return self.statements == other.statements
+            return self.statements == cast(CompoundStatement, other).statements
 
         return False
 

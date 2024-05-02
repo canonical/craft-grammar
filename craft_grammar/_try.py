@@ -16,15 +16,11 @@
 
 """Try Statement for Craft Grammar."""
 
-from typing import TYPE_CHECKING, Optional
 
 from overrides import overrides
 
+from ._base_processor import BaseProcessor
 from ._statement import CallStack, Grammar, Statement
-
-# Don't use circular imports unless type checking
-if TYPE_CHECKING:
-    from ._processor import GrammarProcessor
 
 
 class TryStatement(Statement):
@@ -47,8 +43,8 @@ class TryStatement(Statement):
         self,
         *,
         body: Grammar,
-        processor: "GrammarProcessor",
-        call_stack: Optional[CallStack] = None
+        processor: BaseProcessor,
+        call_stack: CallStack | None = None,
     ) -> None:
         """Create a TryStatement instance.
 
@@ -58,14 +54,17 @@ class TryStatement(Statement):
         :param call_stack: Call stack leading to this statement.
         """
         super().__init__(
-            body=body, processor=processor, call_stack=call_stack, check_primitives=True
+            body=body,
+            processor=processor,
+            call_stack=call_stack,
+            check_primitives=True,
         )
 
     @overrides
     def check(self) -> bool:
         return self._validate_primitives(self._process_body())
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         return False
 
     def __str__(self) -> str:

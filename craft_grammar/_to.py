@@ -17,15 +17,13 @@
 """To Statement for Craft Grammar."""
 
 import re
-from typing import TYPE_CHECKING, Optional, Set
+from typing import cast
 
 from overrides import overrides
 
+from ._base_processor import BaseProcessor
 from ._statement import CallStack, Grammar, Statement
 from .errors import ToStatementSyntaxError
-
-if TYPE_CHECKING:
-    from ._processor import GrammarProcessor
 
 _SELECTOR_PATTERN = re.compile(r"\Ato\s+([^,\s](?:,?[^,]+)*)\Z")
 _WHITESPACE_PATTERN = re.compile(r"\A.*\s.*\Z")
@@ -39,8 +37,8 @@ class ToStatement(Statement):
         *,
         to_statement: str,
         body: Grammar,
-        processor: "GrammarProcessor",
-        call_stack: Optional[CallStack] = None,
+        processor: BaseProcessor,
+        call_stack: CallStack | None = None,
     ) -> None:
         """Create a ToStatement instance.
 
@@ -64,9 +62,9 @@ class ToStatement(Statement):
             self._processor.target_arch in self.selectors
         )
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if type(other) is type(self):
-            return self.selectors == other.selectors
+            return self.selectors == cast(ToStatement, other).selectors
 
         return False
 
@@ -74,7 +72,7 @@ class ToStatement(Statement):
         return f"to {', '.join(sorted(self.selectors))}"
 
 
-def _extract_to_clause_selectors(to_statement: str) -> Set[str]:
+def _extract_to_clause_selectors(to_statement: str) -> set[str]:
     """Extract the list of selectors within a to clause.
 
     :param to_statement: The 'to <selector>' part of the 'to' clause.
@@ -98,7 +96,8 @@ def _extract_to_clause_selectors(to_statement: str) -> Set[str]:
     # to provide a very generic error when we can try to be more helpful.
     if _WHITESPACE_PATTERN.match(selector_group):
         raise ToStatementSyntaxError(
-            to_statement, message="spaces are not allowed in the selectors"
+            to_statement,
+            message="spaces are not allowed in the selectors",
         )
 
     return {selector.strip() for selector in selector_group.split(",")}

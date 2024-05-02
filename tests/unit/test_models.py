@@ -16,12 +16,11 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import textwrap
-from typing import Any, Dict, List
+from typing import Any
 
 import pydantic
 import pytest
 import yaml
-
 from craft_grammar.models import Grammar
 
 
@@ -33,9 +32,9 @@ class ValidationTest(pydantic.BaseModel):
     grammar_int: Grammar[int]
     grammar_float: Grammar[float]
     grammar_str: Grammar[str]
-    grammar_strlist: Grammar[List[str]]
-    grammar_dict: Grammar[Dict[str, Any]]
-    grammar_dictlist: Grammar[List[Dict]]
+    grammar_strlist: Grammar[list[str]]
+    grammar_dict: Grammar[dict[str, Any]]
+    grammar_dictlist: Grammar[list[dict]]
 
 
 def test_validate_grammar_trivial():
@@ -59,8 +58,8 @@ def test_validate_grammar_trivial():
                 other_key: other_value
               - key2: value
                 other_key2: other_value
-            """
-        )
+            """,
+        ),
     )
 
     v = ValidationTest(**data)
@@ -112,8 +111,8 @@ def test_validate_grammar_simple():
                  - key2: value
                    other_key2: other_value
               - else fail
-            """
-        )
+            """,
+        ),
     )
 
     v = ValidationTest(**data)
@@ -147,7 +146,7 @@ def test_validate_grammar_simple():
             "*on arch": [
                 {"key": "value", "other_key": "other_value"},
                 {"key2": "value", "other_key2": "other_value"},
-            ]
+            ],
         },
         "*else fail",
     ]
@@ -219,8 +218,8 @@ def test_validate_grammar_recursive():
                     - yet_another_key: yet_another_value
                     - yet_another_key2: yet_another_value2
               - else fail
-            """
-        )
+            """,
+        ),
     )
 
     v = ValidationTest(**data)
@@ -243,7 +242,7 @@ def test_validate_grammar_recursive():
             "*else": [
                 {"*to arm64": "this other thing"},
                 "*else fail",
-            ]
+            ],
         },
     ]
     assert v.grammar_strlist == [
@@ -255,15 +254,15 @@ def test_validate_grammar_recursive():
                         "string",
                         "list",
                         {"*to amd64": ["with", "extras"]},
-                    ]
+                    ],
                 },
                 {
                     "*else": [
                         {"*on s390x": ["we're", "on", "s390x"]},
                         "*else fail",
-                    ]
+                    ],
                 },
-            ]
+            ],
         },
         {"*else": ["other", "stuff"]},
     ]
@@ -275,14 +274,14 @@ def test_validate_grammar_recursive():
                     "*on other_arch": [
                         {
                             "*to yet_another_arch": {
-                                "yet_another_key": "yet_another_value"
-                            }
+                                "yet_another_key": "yet_another_value",
+                            },
                         },
                         "*else fail",
-                    ]
+                    ],
                 },
                 "*else fail",
-            ]
+            ],
         },
     ]
 
@@ -295,10 +294,10 @@ def test_validate_grammar_recursive():
                             "*to yet_another_arch": [
                                 {"key": "value", "other_key": "other_value"},
                                 {"key2": "value", "other_key2": "other_value"},
-                            ]
+                            ],
                         },
                         "*else fail",
-                    ]
+                    ],
                 },
                 {
                     "*else": [
@@ -308,9 +307,9 @@ def test_validate_grammar_recursive():
                         {
                             "yet_another_key2": "yet_another_value2",
                         },
-                    ]
+                    ],
                 },
-            ]
+            ],
         },
         "*else fail",
     ]
@@ -327,7 +326,7 @@ def test_grammar_str_error(value):
         x: Grammar[str]
 
     with pytest.raises(pydantic.ValidationError) as raised:
-        GrammarValidation(x=value)  # type: ignore
+        GrammarValidation(x=value)
 
     err = raised.value.errors()
     assert len(err) == 1
@@ -344,10 +343,10 @@ def test_grammar_strlist_error(value):
     class GrammarValidation(pydantic.BaseModel):
         """Test validation of grammar-enabled types."""
 
-        x: Grammar[List[str]]
+        x: Grammar[list[str]]
 
     with pytest.raises(pydantic.ValidationError) as raised:
-        GrammarValidation(x=value)  # type: ignore
+        GrammarValidation(x=value)
 
     err = raised.value.errors()
     assert len(err) == 1
@@ -364,9 +363,9 @@ def test_grammar_nested_error():
 
     with pytest.raises(pydantic.ValidationError) as raised:
         GrammarValidation(
-            x=[
+            x=[  # pyright: ignore [reportArgumentType]
                 {"on arm64,amd64": [{"on arm64": "foo"}, {"else": [35]}]},
-            ]  # type: ignore
+            ],
         )
     err = raised.value.errors()
     assert len(err) == 1
@@ -381,16 +380,20 @@ def test_grammar_str_elsefail():
 
         x: Grammar[str]
 
-    GrammarValidation(x=[{"on arch": "foo"}, "else fail"])  # type: ignore
+    GrammarValidation(
+        x=[{"on arch": "foo"}, "else fail"],  # pyright: ignore [reportArgumentType]
+    )
 
 
 def test_grammar_strlist_elsefail():
     class GrammarValidation(pydantic.BaseModel):
         """Test validation of grammar-enabled types."""
 
-        x: Grammar[List[str]]
+        x: Grammar[list[str]]
 
-    GrammarValidation(x=[{"on arch": ["foo"]}, "else fail"])  # type: ignore
+    GrammarValidation(
+        x=[{"on arch": ["foo"]}, "else fail"],  # pyright: ignore [reportArgumentType]
+    )
 
 
 def test_grammar_try():
@@ -400,7 +403,7 @@ def test_grammar_try():
         x: Grammar[str]
 
     with pytest.raises(pydantic.ValidationError) as raised:
-        GrammarValidation(x=[{"try": "foo"}])  # type: ignore
+        GrammarValidation(x=[{"try": "foo"}])  # pyright: ignore [reportArgumentType]
 
     err = raised.value.errors()
     assert len(err) == 1
@@ -410,7 +413,7 @@ def test_grammar_try():
 
 
 @pytest.mark.parametrize(
-    "clause,err_msg",
+    ("clause", "err_msg"),
     [
         ("on", "value must be a str: [{'on': 'foo'}]"),
         ("on ,", "syntax error in 'on' selector"),
@@ -443,7 +446,7 @@ def test_grammar_errors(clause, err_msg):
         x: Grammar[str]
 
     with pytest.raises(pydantic.ValidationError) as raised:
-        GrammarValidation(x=[{clause: "foo"}])  # type: ignore
+        GrammarValidation(x=[{clause: "foo"}])  # pyright: ignore [reportArgumentType]
 
     err = raised.value.errors()
     assert len(err) == 1

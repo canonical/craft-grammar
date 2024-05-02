@@ -17,15 +17,13 @@
 """On Statement for Craft Grammar."""
 
 import re
-from typing import TYPE_CHECKING, Optional, Set
+from typing import cast
 
 from overrides import overrides
 
+from ._base_processor import BaseProcessor
 from ._statement import CallStack, Grammar, Statement
 from .errors import OnStatementSyntaxError
-
-if TYPE_CHECKING:
-    from ._processor import GrammarProcessor
 
 _SELECTOR_PATTERN = re.compile(r"\Aon\s+([^,\s](?:,?[^,]+)*)\Z")
 _WHITESPACE_PATTERN = re.compile(r"\A.*\s.*\Z")
@@ -39,8 +37,8 @@ class OnStatement(Statement):
         *,
         on_statement: str,
         body: Grammar,
-        processor: "GrammarProcessor",
-        call_stack: Optional[CallStack] = None,
+        processor: BaseProcessor,
+        call_stack: CallStack | None = None,
     ) -> None:
         """Create an OnStatement instance.
 
@@ -62,9 +60,9 @@ class OnStatement(Statement):
         # selector.
         return (len(self.selectors) == 1) and (self._processor.arch in self.selectors)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if type(other) is type(self):
-            return self.selectors == other.selectors
+            return self.selectors == cast(OnStatement, other).selectors
 
         return False
 
@@ -72,7 +70,7 @@ class OnStatement(Statement):
         return f"on {','.join(sorted(self.selectors))}"
 
 
-def _extract_on_clause_selectors(on_statement: str) -> Set[str]:
+def _extract_on_clause_selectors(on_statement: str) -> set[str]:
     """Extract the list of selectors within an on clause.
 
     :param str on_statement: The 'on <selector>' part of the 'on' clause.
@@ -96,7 +94,8 @@ def _extract_on_clause_selectors(on_statement: str) -> Set[str]:
     # to provide a very generic error when we can try to be more helpful.
     if _WHITESPACE_PATTERN.match(selector_group):
         raise OnStatementSyntaxError(
-            on_statement, message="spaces are not allowed in the selectors"
+            on_statement,
+            message="spaces are not allowed in the selectors",
         )
 
     return {selector.strip() for selector in selector_group.split(",")}

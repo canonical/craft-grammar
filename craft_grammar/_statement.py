@@ -17,17 +17,14 @@
 """Statement definition for Craft Grammar."""
 
 from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Optional, Sequence, Union
+from collections.abc import Iterable
 
 from . import errors
+from ._base_processor import BaseProcessor
+from ._types import Grammar
 
-Grammar = Sequence[Union[str, Dict[str, Any]]]
-"""Grammar type."""
-CallStack = List["Statement"]
+CallStack = list["Statement"]
 """CallStack type."""
-
-if TYPE_CHECKING:
-    from . import GrammarProcessor
 
 
 class Statement(metaclass=ABCMeta):
@@ -37,9 +34,9 @@ class Statement(metaclass=ABCMeta):
         self,
         *,
         body: Grammar,
-        processor: "GrammarProcessor",
-        call_stack: Optional[CallStack],
-        check_primitives: bool = False
+        processor: BaseProcessor,
+        call_stack: CallStack | None,
+        check_primitives: bool = False,
     ) -> None:
         """Create an Statement instance.
 
@@ -60,12 +57,12 @@ class Statement(metaclass=ABCMeta):
         self._body = body
         self._processor = processor
         self._check_primitives = check_primitives
-        self._else_bodies: List[Optional[Grammar]] = []
+        self._else_bodies: list[Grammar | None] = []
 
-        self.__processed_body: Optional[List[str]] = None
-        self.__processed_else: Optional[List[str]] = None
+        self.__processed_body: list[str] | None = None
+        self.__processed_else: list[str] | None = None
 
-    def add_else(self, else_body: Optional[Grammar]) -> None:
+    def add_else(self, else_body: Grammar | None) -> None:
         """Add an 'else' clause to the statement.
 
         :param list else_body: The body of an 'else' clause.
@@ -74,32 +71,28 @@ class Statement(metaclass=ABCMeta):
         """
         self._else_bodies.append(else_body)
 
-    def process(self) -> List[str]:
+    def process(self) -> list[str]:
         """Process this statement.
 
         :return: Primitives as determined by evaluating the statement or its
                  else clauses.
         """
-        if self.check():
-            primitives = self._process_body()
-        else:
-            primitives = self._process_else()
+        return self._process_body() if self.check() else self._process_else()
 
-        return primitives
-
-    def _process_body(self) -> List[str]:
+    def _process_body(self) -> list[str]:
         """Process the main body of this statement.
 
         :return: Primitives as determined by processing the main body.
         """
         if self.__processed_body is None:
             self.__processed_body = self._processor.process(
-                grammar=self._body, call_stack=self._call_stack(include_self=True)
+                grammar=self._body,
+                call_stack=self._call_stack(include_self=True),
             )
 
         return self.__processed_body
 
-    def _process_else(self) -> List[str]:
+    def _process_else(self) -> list[str]:
         """Process the else clauses of this statement in order.
 
         :return: Primitives as determined by processing the else clauses.
@@ -114,12 +107,13 @@ class Statement(metaclass=ABCMeta):
                 raise errors.UnsatisfiedStatementError(str(self))
 
             processed_else = self._processor.process(
-                grammar=else_body, call_stack=self._call_stack()
+                grammar=else_body,
+                call_stack=self._call_stack(),
             )
             if processed_else:
                 self.__processed_else = processed_else
                 if not self._check_primitives or self._validate_primitives(
-                    processed_else
+                    processed_else,
                 ):
                     break
 
@@ -133,12 +127,9 @@ class Statement(metaclass=ABCMeta):
         :return: Whether or not all primitives are valid.
         :rtype: bool
         """
-        for primitive in primitives:
-            if not self._processor.checker(primitive):
-                return False
-        return True
+        return all(self._processor.checker(primitive) for primitive in primitives)
 
-    def _call_stack(self, *, include_self=False) -> CallStack:
+    def _call_stack(self, *, include_self: bool = False) -> CallStack:
         """Return call stack when processing this statement.
 
         :param bool include_self: Whether or not this statement should be
@@ -150,7 +141,7 @@ class Statement(metaclass=ABCMeta):
 
         return call_stack
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "{self.__str__()!r}"
 
     @abstractmethod
@@ -162,7 +153,7 @@ class Statement(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Return if a statement is equal to another."""
 
     @abstractmethod

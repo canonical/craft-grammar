@@ -18,7 +18,6 @@
 import re
 
 import pytest
-
 from craft_grammar import GrammarProcessor, ToStatement, errors
 
 
@@ -33,7 +32,9 @@ def test_duplicates(entry):
     """Test that multiple identical selector sets is an error."""
 
     processor = GrammarProcessor(
-        arch="amd64", target_arch="amd64", checker=lambda x: True
+        arch="amd64",
+        target_arch="amd64",
+        checker=lambda x: True,
     )
     with pytest.raises(errors.GrammarSyntaxError) as error:
         processor.process(grammar=entry)
@@ -119,7 +120,7 @@ scenarios = [
     # nested amd64 dict
     {
         "grammar_entry": [
-            {"on amd64": [{"on amd64": [{"foo": "bar"}]}, {"on i386": ["bar"]}]}
+            {"on amd64": [{"on amd64": [{"foo": "bar"}]}, {"on i386": ["bar"]}]},
         ],
         "arch": "amd64",
         "target_arch": "amd64",
@@ -308,9 +309,11 @@ transformer_scenarios = [
 def test_grammar_with_transformer(scenario):
     # Transform all 'to' statements to include arch
     def transformer(call_stack, package_name, target_arch):
-        if any(isinstance(s, ToStatement) for s in call_stack):
-            if ":" not in package_name:
-                package_name = f"{package_name}:{target_arch}"
+        if (
+            any(isinstance(s, ToStatement) for s in call_stack)
+            and ":" not in package_name
+        ):
+            package_name = f"{package_name}:{target_arch}"
 
         return package_name
 
@@ -344,7 +347,9 @@ error_scenarios = [
 @pytest.mark.parametrize("scenario", error_scenarios)
 def test_invalid_grammar(scenario):
     processor = GrammarProcessor(
-        arch="amd64", target_arch="amd64", checker=lambda x: True
+        arch="amd64",
+        target_arch="amd64",
+        checker=lambda x: True,
     )
 
     with pytest.raises(errors.GrammarSyntaxError) as error:
