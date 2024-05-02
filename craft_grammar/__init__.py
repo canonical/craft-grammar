@@ -14,11 +14,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-"""Enhance part definitions with advanced grammar."""
-
-__version__ = "2.0.0"
-
+"""Enhance project definitions with advanced grammar."""
 
 from . import errors
 from ._compound import CompoundStatement
@@ -29,7 +25,18 @@ from ._to import ToStatement
 from ._try import TryStatement
 from .create import create_grammar_model
 
+try:
+    from ._version import __version__
+except ImportError:  # pragma: no cover
+    from importlib.metadata import version, PackageNotFoundError
+
+    try:
+        __version__ = version("craft-grammar")
+    except PackageNotFoundError:
+        __version__ = "dev"
+
 __all__ = [
+    "__version__",
     "errors",
     "CallStack",
     "CompoundStatement",
