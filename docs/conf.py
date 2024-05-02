@@ -1,72 +1,60 @@
-# Configuration file for the Sphinx documentation builder.
+# Copyright 2023-2024 Canonical Ltd.
 #
-# For the full list of built-in configuration values, see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License version 3 as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
 
-# -- Project information -----------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+import datetime
 
 project = "Craft Grammar"
-copyright = "2024, Canonical"
-author = "Canonical"
+author = "Canonical Group Ltd"
 
-# region General configuration
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
+copyright = "2022-%s, %s" % (datetime.date.today().year, author)
+
+# region Configuration for canonical-sphinx
+ogp_site_url = "https://canonical-craft-grammar.readthedocs-hosted.com/"
+ogp_site_name = project
+ogp_image = "https://assets.ubuntu.com/v1/253da317-image-document-ubuntudocs.svg"
+
+html_context = {
+    "product_page": "github.com/canonical/craft-grammar",
+    "github_url": "https://github.com/canonical/craft-grammar",
+}
 
 extensions = [
-    "sphinx.ext.intersphinx",
-    "sphinx.ext.viewcode",
-    "sphinx.ext.coverage",
-    "sphinx.ext.doctest",
-    "sphinx_design",
-    "sphinx_copybutton",
-    "sphinx-pydantic",
-    "sphinx_toolbox",
-    "sphinx_toolbox.more_autodoc",
-    "sphinx.ext.autodoc",  # Must be loaded after more_autodoc
+    "canonical_sphinx",
 ]
-
-templates_path = ["_templates"]
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
-
-show_authors = False
-
 # endregion
-# region Options for HTML output
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = "furo"
-html_static_path = ["_static"]
-html_css_files = [
-    "css/custom.css",
-]
+extensions.extend(
+    [
+        "sphinx.ext.autodoc",
+    ]
+)
 
-# endregion
 # region Options for extensions
-# Intersphinx extension
-# https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html#configuration
-
-intersphinx_mapping = {
-    "python": ("https://docs.python.org/3", None),
-}
 
 # Type hints configuration
 set_type_checking_flag = True
 typehints_fully_qualified = False
 always_document_param_types = True
+typehints_document_rtype = True
 
 # Github config
 github_username = "canonical"
-github_repository = "craft-grammar"
+github_repository = "craft-application"
 
-# sphinx_autodoc_typehints
-set_type_checking_flag = True
-typehints_fully_qualified = False
-always_document_param_types = True
-typehints_document_rtype = True
-
-# Enable support for google-style instance attributes.
-napoleon_use_ivar = True
+# endregion
 
 
 def run_apidoc(_):
@@ -83,6 +71,3 @@ def run_apidoc(_):
 
 def setup(app):
     app.connect("builder-inited", run_apidoc)
-
-
-# endregion
