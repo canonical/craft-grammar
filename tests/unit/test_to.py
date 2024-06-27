@@ -32,6 +32,19 @@ def test_on():
     assert clause.process() == ["foo"]
 
 
+def test_on_list():
+    processor = GrammarProcessor(
+        checker=lambda x: True,
+        arch="amd64",
+        target_arch="amd64",
+    )
+
+    clause = ToStatement(
+        to_statement="to [amd64,arm64]", body=["foo"], processor=processor
+    )
+    assert clause.process() == ["foo"]
+
+
 def test_on_else():
     processor = GrammarProcessor(
         checker=lambda x: True,
