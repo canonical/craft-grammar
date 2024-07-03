@@ -3,7 +3,7 @@ name = "craft-grammar"
 dynamic = ["version", "readme"]
 dependencies = [
     "overrides",
-    "pydantic<2.0",
+    "pydantic<2.9",
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
