@@ -52,10 +52,6 @@ class MyModel(BaseModel):
     # A field with a default factory
     factory_field: str = Field(default_factory=str)
 
-    # Untyped fields are ignored
-    untyped_1 = "untyped_1"
-    untyped_2 = 1
-
 
 EXPECTED_GRAMMAR_MODEL = """\
 class GrammarMyModel(BaseModel):
@@ -67,11 +63,11 @@ class GrammarMyModel(BaseModel):
         alias_generator = lambda s: s.replace("_", "-")
 
     str_value: Grammar[str]
-    str_value_or_none: Grammar[str] | None = None
-    optional_str_value: Optional[Grammar[str]] = None
+    str_value_or_none: Grammar[str] | None
+    optional_str_value: Optional[Grammar[str]]
     str_with_default: Grammar[str] = "string"
     str_or_non_with_default: Grammar[str] | None = "string or None"
-    union_value: Grammar[Union[str, int, None]] = None
+    union_value: Grammar[Union[str, int, None]]
     literal_value: Grammar[str] = "green"
     list_value: Grammar[list[int]] = []
     other_list: Grammar[List[int]]

@@ -331,13 +331,13 @@ def test_grammar_str_error(value):
     err = raised.value.errors()
     assert len(err) == 1
     assert err[0]["loc"] == ("x",)
-    assert err[0]["type"] == "type_error"
-    assert err[0]["msg"] == f"value must be a str: {value!r}"
+    assert err[0]["type"] == "value_error"
+    assert err[0]["msg"] == f"Value error, value must be a str: {value!r}"
 
 
 @pytest.mark.parametrize(
     "value",
-    [23, "foo", ["foo", 23], {"x"}, [{"a": "b"}]],
+    [23, "foo", ["foo", 23], [{"a": "b"}]],
 )
 def test_grammar_strlist_error(value):
     class GrammarValidation(pydantic.BaseModel):
@@ -351,8 +351,8 @@ def test_grammar_strlist_error(value):
     err = raised.value.errors()
     assert len(err) == 1
     assert err[0]["loc"] == ("x",)
-    assert err[0]["type"] == "type_error"
-    assert err[0]["msg"] == f"value must be a list of str: {value!r}"
+    assert err[0]["type"] == "value_error"
+    assert err[0]["msg"] == f"Value error, value must be a list of str: {value!r}"
 
 
 def test_grammar_nested_error():
@@ -370,8 +370,8 @@ def test_grammar_nested_error():
     err = raised.value.errors()
     assert len(err) == 1
     assert err[0]["loc"] == ("x",)
-    assert err[0]["type"] == "type_error"
-    assert err[0]["msg"] == "value must be a str: [35]"
+    assert err[0]["type"] == "value_error"
+    assert err[0]["msg"] == "Value error, value must be a str: [35]"
 
 
 def test_grammar_str_elsefail():
@@ -409,7 +409,10 @@ def test_grammar_try():
     assert len(err) == 1
     assert err[0]["loc"] == ("x",)
     assert err[0]["type"] == "value_error"
-    assert err[0]["msg"] == "'try' was removed from grammar, use 'on <arch>' instead"
+    assert (
+        err[0]["msg"]
+        == "Value error, 'try' was removed from grammar, use 'on <arch>' instead"
+    )
 
 
 @pytest.mark.parametrize(
@@ -451,4 +454,4 @@ def test_grammar_errors(clause, err_msg):
     err = raised.value.errors()
     assert len(err) == 1
     assert err[0]["loc"] == ("x",)
-    assert err[0]["msg"] == err_msg
+    assert err_msg in err[0]["msg"]
