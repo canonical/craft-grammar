@@ -25,10 +25,7 @@ from craft_grammar.models import Grammar
 
 T = TypeVar("T")
 
-NonEmptyDict = Annotated[
-    dict[str, T],
-    pydantic.Field(min_length=1)
-]
+NonEmptyDict = Annotated[dict[str, T], pydantic.Field(min_length=1)]
 
 
 class ValidationTest(pydantic.BaseModel):

@@ -23,9 +23,9 @@ import re
 from collections.abc import Callable, Iterator
 from typing import Any, Generic, TypeVar, get_args, get_origin
 
-from overrides import overrides
-from pydantic import ValidationError, ValidationInfo, create_model
 import pydantic
+from overrides import overrides
+from pydantic import ValidationError, ValidationInfo
 
 _on_pattern = re.compile(r"^on\s+(.+)\s*$")
 _to_pattern = re.compile(r"^to\s+(.+)\s*$")
@@ -138,8 +138,6 @@ class GrammarMetaClass(type):
                 # handle primitive types with pydantic validators
                 try:
                     type_adapter.validate_python(input_value)
-                    # model_class = create_model("DynamicModel", foo=(type_, ...))
-                    # _instance = model_class(foo=input_value)
                 except ValidationError as err:
                     raise ValueError(_format_type_error(type_, input_value)) from err
 
