@@ -16,12 +16,16 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import textwrap
-from typing import Any
+from typing import Annotated, Any, TypeVar
 
 import pydantic
 import pytest
 import yaml
 from craft_grammar.models import Grammar
+
+T = TypeVar("T")
+
+NonEmptyDict = Annotated[dict[str, T], pydantic.Field(min_length=1)]
 
 
 class ValidationTest(pydantic.BaseModel):
@@ -35,6 +39,7 @@ class ValidationTest(pydantic.BaseModel):
     grammar_strlist: Grammar[list[str]]
     grammar_dict: Grammar[dict[str, Any]]
     grammar_dictlist: Grammar[list[dict]]
+    grammar_annotated: Grammar[NonEmptyDict[int]]
 
 
 def test_validate_grammar_trivial():
@@ -58,6 +63,8 @@ def test_validate_grammar_trivial():
                 other_key: other_value
               - key2: value
                 other_key2: other_value
+            grammar_annotated:
+              thing: 123
             """,
         ),
     )
@@ -74,6 +81,7 @@ def test_validate_grammar_trivial():
         {"key": "value", "other_key": "other_value"},
         {"key2": "value", "other_key2": "other_value"},
     ]
+    assert v.grammar_annotated == {"thing": 123}
 
 
 def test_validate_grammar_simple():
@@ -111,11 +119,18 @@ def test_validate_grammar_simple():
                  - key2: value
                    other_key2: other_value
               - else fail
+            grammar_annotated:
+              - on amd64:
+                  thing: 64
+              - on riscv64:
+                  riscy: 64
+              - else:
+                  what: 0
             """,
         ),
     )
 
-    v = ValidationTest(**data)
+    v = ValidationTest.model_validate(data)
     assert v.control == "a string"
     assert v.grammar_bool == [
         {"*on amd64": True},
@@ -149,6 +164,23 @@ def test_validate_grammar_simple():
             ],
         },
         "*else fail",
+    ]
+    assert v.grammar_annotated == [
+        {
+            "*on amd64": {
+                "thing": 64,
+            },
+        },
+        {
+            "*on riscv64": {
+                "riscy": 64,
+            },
+        },
+        {
+            "*else": {
+                "what": 0,
+            },
+        },
     ]
 
 
@@ -217,6 +249,14 @@ def test_validate_grammar_recursive():
                  - else:
                     - yet_another_key: yet_another_value
                     - yet_another_key2: yet_another_value2
+              - else fail
+            grammar_annotated:
+              - on amd64:
+                  thing: 123
+              - on riscv64 to arm64:
+                  thing: 64
+              - else:
+                  thing: 65
               - else fail
             """,
         ),
@@ -311,6 +351,12 @@ def test_validate_grammar_recursive():
                 },
             ],
         },
+        "*else fail",
+    ]
+    assert v.grammar_annotated == [
+        {"*on amd64": {"thing": 123}},
+        {"*on riscv64 to arm64": {"thing": 64}},
+        {"*else": {"thing": 65}},
         "*else fail",
     ]
 
