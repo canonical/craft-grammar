@@ -165,6 +165,23 @@ def test_validate_grammar_simple():
         },
         "*else fail",
     ]
+    assert v.grammar_annotated == [
+        {
+            "*on amd64": {
+                "thing": 64,
+            },
+        },
+        {
+            "*on riscv64": {
+                "riscy": 64,
+            },
+        },
+        {
+            "*else": {
+                "what": 0,
+            },
+        },
+    ]
 
 
 def test_validate_grammar_recursive():
@@ -334,6 +351,12 @@ def test_validate_grammar_recursive():
                 },
             ],
         },
+        "*else fail",
+    ]
+    assert v.grammar_annotated == [
+        {"*on amd64": {"thing": 123}},
+        {"*on riscv64 to arm64": {"thing": 64}},
+        {"*else": {"thing": 65}},
         "*else fail",
     ]
 
