@@ -20,12 +20,12 @@
 
 import abc
 import re
-from collections.abc import Callable, Iterator
 from typing import Any, Generic, TypeVar, get_args, get_origin
 
 import pydantic
 from overrides import overrides
-from pydantic import ValidationError, ValidationInfo
+from pydantic import GetCoreSchemaHandler, ValidationError, ValidationInfo
+from pydantic_core import core_schema
 
 _on_pattern = re.compile(r"^on\s+(.+)\s*$")
 _to_pattern = re.compile(r"^to\s+(.+)\s*$")
@@ -41,8 +41,15 @@ T = TypeVar("T")
 
 class _GrammarBase(abc.ABC):
     @classmethod
-    def __get_validators__(cls) -> Iterator[Callable[[Any, ValidationInfo], Any]]:
-        yield cls.validate
+    def __get_pydantic_core_schema__(
+        cls,
+        source: type[Any],
+        handler: GetCoreSchemaHandler,
+    ) -> core_schema.CoreSchema:
+        return core_schema.with_info_after_validator_function(
+            cls.validate,
+            core_schema.any_schema(),
+        )
 
     @classmethod
     @abc.abstractmethod
