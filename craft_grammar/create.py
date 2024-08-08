@@ -56,12 +56,14 @@ def create_grammar_model(model_class: type[BaseModel]) -> str:
             )
             continue
 
-        attr_field = model_class.__fields__[attr_name]
+        attr_field = model_class.model_fields[attr_name]
         alias = attr_field.alias
-        new_name = alias if "-" not in alias else attr_name
+        new_name = attr_name
+        if alias and "-" not in alias:
+            new_name = alias
         attr_decl = f"{new_name}: {grammar_type}"
 
-        if not attr_field.required:
+        if not attr_field.is_required():
             default_factory = attr_field.default_factory
             if default_factory is not None:
                 default = repr(default_factory())
@@ -81,7 +83,7 @@ def create_grammar_model(model_class: type[BaseModel]) -> str:
     return "\n".join(lines)
 
 
-def _get_grammar_type_for(  # noqa: PLR0911 (too-many-return-statements)
+def _get_grammar_type_for(  # noqa: PLR0911,PLR0912 (too many returns/branches)
     model_type: type,
 ) -> str | None:
     """Get the "grammar" type for ``model_type``.

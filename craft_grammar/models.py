@@ -20,12 +20,12 @@
 
 import abc
 import re
-from collections.abc import Callable, Iterator
 from typing import Any, Generic, TypeVar, get_args, get_origin
 
+import pydantic
 from overrides import overrides
-from pydantic import BaseConfig, PydanticTypeError
-from pydantic.validators import find_validators
+from pydantic import GetCoreSchemaHandler, ValidationError, ValidationInfo
+from pydantic_core import core_schema
 
 _on_pattern = re.compile(r"^on\s+(.+)\s*$")
 _to_pattern = re.compile(r"^to\s+(.+)\s*$")
@@ -41,21 +41,28 @@ T = TypeVar("T")
 
 class _GrammarBase(abc.ABC):
     @classmethod
-    def __get_validators__(cls) -> Iterator[Callable[[Any], Any]]:
-        yield cls.validate
+    def __get_pydantic_core_schema__(
+        cls,
+        source: type[Any],
+        handler: GetCoreSchemaHandler,
+    ) -> core_schema.CoreSchema:
+        return core_schema.with_info_after_validator_function(
+            cls.validate,
+            core_schema.any_schema(),
+        )
 
     @classmethod
     @abc.abstractmethod
-    def validate(cls, entry: Any) -> Any:
+    def validate(cls, input_value: Any, /, info: ValidationInfo) -> Any:
         """Ensure the given entry is valid type or grammar."""
 
     @classmethod
-    def _grammar_append(cls, entry: list[Any], item: Any) -> None:
+    def _grammar_append(cls, entry: list[Any], item: Any, info: ValidationInfo) -> None:
         if item == _ELSE_FAIL:
             _mark_and_append(entry, item)
         else:
             key, value = tuple(item.items())[0]
-            _mark_and_append(entry, {key: cls.validate(value)})
+            _mark_and_append(entry, {key: cls.validate(value, info)})
 
 
 def _format_type_error(type_: type, entry: Any) -> str:
@@ -96,9 +103,9 @@ class GrammarMetaClass(type):
 
             @classmethod
             @overrides
-            def validate(cls, entry: Any) -> Any:
+            def validate(cls, input_value: Any, /, info: ValidationInfo) -> Any:
                 # Grammar[T] entry can be a list if it contains clauses
-                if isinstance(entry, list):
+                if isinstance(input_value, list):
                     # Check if the type_ supposed to be a list
                     sub_type: Any = get_args(type_)
 
@@ -109,35 +116,39 @@ class GrammarMetaClass(type):
                             sub_type = None
 
                     new_entry: list[Any] = []
-                    for item in entry:
+                    for item in input_value:
                         # Check if the item is a valid grammar clause
                         if _is_grammar_clause(item):
-                            cls._grammar_append(new_entry, item)
-                        elif sub_type and isinstance(item, sub_type):
-                            new_entry.append(item)
-                        else:
-                            raise TypeError(_format_type_error(type_, entry))
+                            cls._grammar_append(new_entry, item, info)
+                            continue
+                        if sub_type:
+                            sub_type_adapter = pydantic.TypeAdapter(sub_type)
+                            try:
+                                sub_type_adapter.validate_python(item)
+                            except ValidationError:
+                                pass
+                            else:
+                                new_entry.append(item)
+                                continue
+                        raise ValueError(_format_type_error(type_, input_value))
 
                     return new_entry
 
-                # Not a valid grammar, check if it is a dict
-                if isinstance(entry, dict):
-                    # Check if the type_ supposed to be a dict
-                    if get_origin(type_) is not dict:
-                        raise TypeError(_format_type_error(type_, entry))
+                type_adapter = pydantic.TypeAdapter(type_)
 
-                    # we do not care about the dict contents type, other models will handle it
-                    return entry
+                # Not a valid grammar, check if it is a dict
+                if isinstance(input_value, dict):
+                    # Check if the input is valid in its non-grammar type.
+                    type_adapter.validate_python(input_value)
+                    return input_value
 
                 # handle primitive types with pydantic validators
                 try:
-                    for validator in find_validators(type_, BaseConfig):
-                        # we do not need the return value of the validator
-                        validator(entry)
-                except PydanticTypeError as err:
-                    raise TypeError(_format_type_error(type_, entry)) from err
+                    type_adapter.validate_python(input_value)
+                except ValidationError as err:
+                    raise ValueError(_format_type_error(type_, input_value)) from err
 
-                return entry
+                return input_value
 
         return GrammarScalar
 

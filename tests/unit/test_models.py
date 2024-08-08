@@ -16,12 +16,16 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import textwrap
-from typing import Any
+from typing import Annotated, Any, TypeVar
 
 import pydantic
 import pytest
 import yaml
 from craft_grammar.models import Grammar
+
+T = TypeVar("T")
+
+NonEmptyDict = Annotated[dict[str, T], pydantic.Field(min_length=1)]
 
 
 class ValidationTest(pydantic.BaseModel):
@@ -35,6 +39,7 @@ class ValidationTest(pydantic.BaseModel):
     grammar_strlist: Grammar[list[str]]
     grammar_dict: Grammar[dict[str, Any]]
     grammar_dictlist: Grammar[list[dict]]
+    grammar_annotated: Grammar[NonEmptyDict[int]]
 
 
 def test_validate_grammar_trivial():
@@ -58,6 +63,8 @@ def test_validate_grammar_trivial():
                 other_key: other_value
               - key2: value
                 other_key2: other_value
+            grammar_annotated:
+              thing: 123
             """,
         ),
     )
@@ -74,6 +81,7 @@ def test_validate_grammar_trivial():
         {"key": "value", "other_key": "other_value"},
         {"key2": "value", "other_key2": "other_value"},
     ]
+    assert v.grammar_annotated == {"thing": 123}
 
 
 def test_validate_grammar_simple():
@@ -111,11 +119,18 @@ def test_validate_grammar_simple():
                  - key2: value
                    other_key2: other_value
               - else fail
+            grammar_annotated:
+              - on amd64:
+                  thing: 64
+              - on riscv64:
+                  riscy: 64
+              - else:
+                  what: 0
             """,
         ),
     )
 
-    v = ValidationTest(**data)
+    v = ValidationTest.model_validate(data)
     assert v.control == "a string"
     assert v.grammar_bool == [
         {"*on amd64": True},
@@ -149,6 +164,23 @@ def test_validate_grammar_simple():
             ],
         },
         "*else fail",
+    ]
+    assert v.grammar_annotated == [
+        {
+            "*on amd64": {
+                "thing": 64,
+            },
+        },
+        {
+            "*on riscv64": {
+                "riscy": 64,
+            },
+        },
+        {
+            "*else": {
+                "what": 0,
+            },
+        },
     ]
 
 
@@ -217,6 +249,14 @@ def test_validate_grammar_recursive():
                  - else:
                     - yet_another_key: yet_another_value
                     - yet_another_key2: yet_another_value2
+              - else fail
+            grammar_annotated:
+              - on amd64:
+                  thing: 123
+              - on riscv64 to arm64:
+                  thing: 64
+              - else:
+                  thing: 65
               - else fail
             """,
         ),
@@ -313,6 +353,12 @@ def test_validate_grammar_recursive():
         },
         "*else fail",
     ]
+    assert v.grammar_annotated == [
+        {"*on amd64": {"thing": 123}},
+        {"*on riscv64 to arm64": {"thing": 64}},
+        {"*else": {"thing": 65}},
+        "*else fail",
+    ]
 
 
 @pytest.mark.parametrize(
@@ -331,13 +377,13 @@ def test_grammar_str_error(value):
     err = raised.value.errors()
     assert len(err) == 1
     assert err[0]["loc"] == ("x",)
-    assert err[0]["type"] == "type_error"
-    assert err[0]["msg"] == f"value must be a str: {value!r}"
+    assert err[0]["type"] == "value_error"
+    assert err[0]["msg"] == f"Value error, value must be a str: {value!r}"
 
 
 @pytest.mark.parametrize(
     "value",
-    [23, "foo", ["foo", 23], {"x"}, [{"a": "b"}]],
+    [23, "foo", ["foo", 23], [{"a": "b"}]],
 )
 def test_grammar_strlist_error(value):
     class GrammarValidation(pydantic.BaseModel):
@@ -351,8 +397,8 @@ def test_grammar_strlist_error(value):
     err = raised.value.errors()
     assert len(err) == 1
     assert err[0]["loc"] == ("x",)
-    assert err[0]["type"] == "type_error"
-    assert err[0]["msg"] == f"value must be a list of str: {value!r}"
+    assert err[0]["type"] == "value_error"
+    assert err[0]["msg"] == f"Value error, value must be a list of str: {value!r}"
 
 
 def test_grammar_nested_error():
@@ -370,8 +416,8 @@ def test_grammar_nested_error():
     err = raised.value.errors()
     assert len(err) == 1
     assert err[0]["loc"] == ("x",)
-    assert err[0]["type"] == "type_error"
-    assert err[0]["msg"] == "value must be a str: [35]"
+    assert err[0]["type"] == "value_error"
+    assert err[0]["msg"] == "Value error, value must be a str: [35]"
 
 
 def test_grammar_str_elsefail():
@@ -409,7 +455,10 @@ def test_grammar_try():
     assert len(err) == 1
     assert err[0]["loc"] == ("x",)
     assert err[0]["type"] == "value_error"
-    assert err[0]["msg"] == "'try' was removed from grammar, use 'on <arch>' instead"
+    assert (
+        err[0]["msg"]
+        == "Value error, 'try' was removed from grammar, use 'on <arch>' instead"
+    )
 
 
 @pytest.mark.parametrize(
@@ -451,4 +500,4 @@ def test_grammar_errors(clause, err_msg):
     err = raised.value.errors()
     assert len(err) == 1
     assert err[0]["loc"] == ("x",)
-    assert err[0]["msg"] == err_msg
+    assert err_msg in err[0]["msg"]
