@@ -2,6 +2,18 @@
 Changelog
 *********
 
+2.0.0 (2024-08-08)
+------------------
+
+Breaking changes:
+
+- Migrate to Pydantic 2
+- Generic grammar types
+- Make minimum Python version 3.10
+
+Features:
+- Add create_grammar_model() function to make a pydantic model grammar-aware
+
 1.2.0 (2024-04-05)
 ------------------
 
