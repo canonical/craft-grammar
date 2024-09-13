@@ -29,6 +29,7 @@ CONFIG_TEMPLATE = """
         extra = "ignore"
         allow_mutation = False
         alias_generator = lambda s: s.replace("_", "-")
+        coerce_numbers_to_str = True
 """
 
 
