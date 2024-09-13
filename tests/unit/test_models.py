@@ -24,12 +24,18 @@ import yaml
 from craft_grammar.models import Grammar
 
 T = TypeVar("T")
+Tv = TypeVar("Tv")
 
 NonEmptyDict = Annotated[dict[str, T], pydantic.Field(min_length=1)]
 
+SingleEntryDict = Annotated[
+    dict[T, Tv],
+    pydantic.Field(min_length=1, max_length=1),
+]
 
 class ValidationTest(pydantic.BaseModel):
     """A test model containing all types of grammar-aware types."""
+    model_config = pydantic.ConfigDict(coerce_numbers_to_str=True)
 
     control: str
     grammar_bool: Grammar[bool]
@@ -40,6 +46,7 @@ class ValidationTest(pydantic.BaseModel):
     grammar_dict: Grammar[dict[str, Any]]
     grammar_dictlist: Grammar[list[dict]]
     grammar_annotated: Grammar[NonEmptyDict[int]]
+    build_environment: Grammar[list[SingleEntryDict[str, str]]] | None = None
 
 
 def test_validate_grammar_trivial():
@@ -65,6 +72,8 @@ def test_validate_grammar_trivial():
                 other_key2: other_value
             grammar_annotated:
               thing: 123
+            build_environment:
+              - CGO_ENABLED: 0
             """,
         ),
     )
@@ -82,6 +91,7 @@ def test_validate_grammar_trivial():
         {"key2": "value", "other_key2": "other_value"},
     ]
     assert v.grammar_annotated == {"thing": 123}
+    assert v.build_environment == [{"CGO_ENABLED": "0"}]
 
 
 def test_validate_grammar_simple():
