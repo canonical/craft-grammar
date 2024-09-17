@@ -24,11 +24,13 @@ from pydantic import BaseModel
 logger = logging.getLogger(__name__)
 
 CONFIG_TEMPLATE = """
-    class Config:
-        validate_assignment = True
-        extra = "ignore"
-        allow_mutation = False
-        alias_generator = lambda s: s.replace("_", "-")
+    model_config = ConfigDict(
+        validate_assignment=True,
+        extra="ignore",
+        frozen=True,
+        alias_generator=lambda s: s.replace("_", "-"),
+        coerce_numbers_to_str=True,
+    )
 """
 
 
