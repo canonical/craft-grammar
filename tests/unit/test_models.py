@@ -361,9 +361,21 @@ def test_validate_grammar_recursive():
     ]
 
 
+@pytest.mark.parametrize("value", ["foo", 13, 3.14159])
+def test_grammar_str_success(value):
+    class GrammarValidation(pydantic.BaseModel):
+        """Test validation of grammar-enabled types."""
+
+        x: Grammar[str]
+
+    actual = GrammarValidation(x=value)
+
+    assert actual.x == str(value)
+
+
 @pytest.mark.parametrize(
     "value",
-    [["foo"], {"x"}, [{"a": "b"}]],
+    [["foo"], {"x"}],
 )
 def test_grammar_str_error(value):
     class GrammarValidation(pydantic.BaseModel):
@@ -377,13 +389,27 @@ def test_grammar_str_error(value):
     err = raised.value.errors()
     assert len(err) == 1
     assert err[0]["loc"] == ("x",)
-    assert err[0]["type"] == "value_error"
-    assert err[0]["msg"] == f"Value error, value must be a str: {value!r}"
+    assert err[0]["type"] == "string_type"
+    assert err[0]["msg"] == "Input should be a valid string"
 
 
 @pytest.mark.parametrize(
     "value",
-    [23, "foo", ["foo", 23], [{"a": "b"}]],
+    [["foo"], ["foo", 23]],
+)
+def test_grammar_strlist_success(value):
+    class GrammarValidation(pydantic.BaseModel):
+        """Test validation of grammar-enabled types."""
+
+        x: Grammar[list[str]]
+
+    actual = GrammarValidation(x=value)
+    assert actual.x == [str(i) for i in value]
+
+
+@pytest.mark.parametrize(
+    "value",
+    [23, "foo", [{"a": "b"}]],
 )
 def test_grammar_strlist_error(value):
     class GrammarValidation(pydantic.BaseModel):
@@ -393,7 +419,6 @@ def test_grammar_strlist_error(value):
 
     with pytest.raises(pydantic.ValidationError) as raised:
         GrammarValidation(x=value)
-
     err = raised.value.errors()
     assert len(err) == 1
     assert err[0]["loc"] == ("x",)
@@ -415,9 +440,9 @@ def test_grammar_nested_error():
         )
     err = raised.value.errors()
     assert len(err) == 1
-    assert err[0]["loc"] == ("x",)
-    assert err[0]["type"] == "value_error"
-    assert err[0]["msg"] == "Value error, value must be a str: [35]"
+    assert err[0]["loc"] == ("x", 0, 1)
+    assert err[0]["type"] == "string_type"
+    assert err[0]["msg"] == "Input should be a valid string"
 
 
 def test_grammar_str_elsefail():
@@ -453,7 +478,7 @@ def test_grammar_try():
 
     err = raised.value.errors()
     assert len(err) == 1
-    assert err[0]["loc"] == ("x",)
+    assert err[0]["loc"] == ("x", 0)
     assert err[0]["type"] == "value_error"
     assert (
         err[0]["msg"]
@@ -464,13 +489,14 @@ def test_grammar_try():
 @pytest.mark.parametrize(
     ("clause", "err_msg"),
     [
-        ("on", "value must be a str: [{'on': 'foo'}]"),
+        ("a", "value must be a str or valid grammar dict: [{'a': 'foo'}]"),
+        ("on", "value must be a str or valid grammar dict: [{'on': 'foo'}]"),
         ("on ,", "syntax error in 'on' selector"),
         ("on ,arch", "syntax error in 'on' selector"),
         ("on arch,", "syntax error in 'on' selector"),
         ("on arch,,arch", "syntax error in 'on' selector"),
         ("on arch, arch", "spaces are not allowed in 'on' selector"),
-        ("to", "value must be a str: [{'to': 'foo'}]"),
+        ("to", "value must be a str or valid grammar dict: [{'to': 'foo'}]"),
         ("to ,", "syntax error in 'to' selector"),
         ("to ,arch", "syntax error in 'to' selector"),
         ("to arch,", "syntax error in 'to' selector"),
@@ -499,5 +525,5 @@ def test_grammar_errors(clause, err_msg):
 
     err = raised.value.errors()
     assert len(err) == 1
-    assert err[0]["loc"] == ("x",)
-    assert err_msg in err[0]["msg"]
+    assert err[0]["loc"] == ("x", 0)
+    assert err[0]["msg"].endswith(err_msg)

@@ -56,11 +56,13 @@ class MyModel(BaseModel):
 EXPECTED_GRAMMAR_MODEL = """\
 class GrammarMyModel(BaseModel):
 
-    class Config:
-        validate_assignment = True
-        extra = "ignore"
-        allow_mutation = False
-        alias_generator = lambda s: s.replace("_", "-")
+    model_config = ConfigDict(
+        validate_assignment=True,
+        extra="ignore",
+        frozen=True,
+        alias_generator=lambda s: s.replace("_", "-"),
+        coerce_numbers_to_str=True,
+    )
 
     str_value: Grammar[str]
     str_value_or_none: Grammar[str] | None
