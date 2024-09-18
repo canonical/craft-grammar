@@ -2,6 +2,11 @@
 Changelog
 *********
 
+2.0.1 (2024-08-18)
+------------------
+
+- Fix cases where models were not correctly coercing numbers to strings.
+
 2.0.0 (2024-08-08)
 ------------------
 
