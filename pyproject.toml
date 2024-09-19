@@ -52,7 +52,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.dynamic]
-readme = {file = "README.rst"}
+readme = {file = "README.md"}
 
 [tool.setuptools_scm]
 write_to = "craft_grammar/_version.py"
