@@ -179,7 +179,7 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
             if on_to_clause_match:
                 # We've come across the beginning of a compound statement
                 # with both 'on' and 'to'.
-                finalized_statement = statement
+                finalized_statement = _finalize(statement, finalized_statement)
 
                 # First, extract each statement's part of the string
                 on_statement, to_statement = on_to_clause_match.groups()
@@ -213,7 +213,7 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
             elif on_clause_match:
                 # We've come across the beginning of an 'on' statement.
                 # That means any previous statement we found is complete.
-                finalized_statement = statement
+                finalized_statement = _finalize(statement, finalized_statement)
 
                 statement = OnStatement(
                     on_statement=key,
@@ -226,7 +226,7 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
             elif _TO_CLAUSE_PATTERN.match(key):
                 # We've come across the beginning of a 'to' statement.
                 # That means any previous statement we found is complete.
-                finalized_statement = statement
+                finalized_statement = _finalize(statement, finalized_statement)
 
                 statement = ToStatement(
                     to_statement=key,
@@ -238,7 +238,7 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
             elif _TRY_CLAUSE_PATTERN.match(key):
                 # We've come across the beginning of a 'try' statement.
                 # That means any previous statement we found is complete.
-                finalized_statement = statement
+                finalized_statement = _finalize(statement, finalized_statement)
 
                 statement = TryStatement(
                     body=value,
@@ -253,10 +253,19 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
                 # markers to indicate the start or change of statement,
                 # the current statement is complete and this section
                 # is a primitive to be collected.
-                finalized_statement = statement
+                finalized_statement = _finalize(statement, finalized_statement)
                 statement = None
 
         return statement, finalized_statement
+
+
+def _finalize(
+    statement: Statement | None,
+    finalized_statement: Statement | None,
+) -> Statement | None:
+    if statement is None:
+        return finalized_statement
+    return statement
 
 
 def _handle_else(statement: Statement | None, else_body: Grammar | None) -> None:

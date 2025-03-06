@@ -233,7 +233,15 @@ scenarios = [
             {"yes7": "yes7"},
             {"on i386": [{"no3": "no3"}]},
             {"else": [{"yes8": "yes8"}]},
-            {"yes9": "yes9"},
+            {
+                "yes9": "yes9",
+                "yes10": "yes10",
+            },
+            {
+                "on riscv64": [
+                    {"no3": "no3"},
+                ],
+            },
         ],
         "arch": "amd64",
         "target_arch": "amd64",
@@ -246,7 +254,7 @@ scenarios = [
             {"yes6": "yes6"},
             {"yes7": "yes7"},
             {"yes8": "yes8"},
-            {"yes9": "yes9"},
+            {"yes9": "yes9", "yes10": "yes10"},
         ],
     },
 ]
