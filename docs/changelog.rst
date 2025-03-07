@@ -2,6 +2,11 @@
 Changelog
 *********
 
+2.0.2 (2024-03-07)
+------------------
+
+- Fix handling of multi-entry dictionary after grammar statement
+
 2.0.1 (2024-08-18)
 ------------------
 
