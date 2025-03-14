@@ -2,6 +2,11 @@
 Changelog
 *********
 
+2.0.3 (2024-03-14)
+------------------
+
+- Fix grammar validation to ensure compatibility with python 3.13
+
 2.0.2 (2024-03-07)
 ------------------
 
