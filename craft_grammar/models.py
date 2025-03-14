@@ -74,6 +74,7 @@ class _GrammarBase(abc.ABC):
     ) -> list[T]:
         # Check if the type_ is supposed to be a list
         sub_type: Any = get_args(type_)
+        unsubscripted_type = get_origin(type_) or type_
 
         # handle typed list
         if sub_type:
@@ -121,7 +122,7 @@ class _GrammarBase(abc.ABC):
                     pass
                 else:
                     continue
-            if issubclass(type_, str):
+            if issubclass(unsubscripted_type, str):
                 if isinstance(item, dict):
                     errors.append(
                         pydantic_core.InitErrorDetails(
