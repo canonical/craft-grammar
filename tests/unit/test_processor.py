@@ -257,6 +257,35 @@ scenarios = [
             {"yes9": "yes9", "yes10": "yes10"},
         ],
     },
+    # to first element
+    pytest.param(
+            {
+            "grammar_entry": [
+                {"to arm64": ["foo"]},
+                {"to riscv64": ["bar"]},
+                {"else": ["baz"]},
+            ],
+            "arch": "amd64",
+            "target_arch": "arm64",
+            # incorrectly returns `foo` and `baz`
+            "expected_results": ["foo"],
+        },
+        id="to-first-element",
+    ),
+    pytest.param(
+        # to second element
+        {
+            "grammar_entry": [
+                {"to arm64": ["foo"]},
+                {"to riscv64": ["bar"]},
+                {"else": ["baz"]},
+            ],
+            "arch": "amd64",
+            "target_arch": "riscv64",
+            "expected_results": ["bar"],
+        },
+        id="to-second-element",
+    )
 ]
 
 
