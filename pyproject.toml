@@ -27,7 +27,7 @@ dev = [
     "types-PyYAML",
 ]
 lint = [
-    "black~=24.1",
+    "black~=25.1",
     "codespell[toml]~=2.2",
     "ruff~=0.11.2",
     "yamllint~=1.34"
