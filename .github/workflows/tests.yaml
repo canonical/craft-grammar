@@ -48,7 +48,7 @@ jobs:
   unit:
     strategy:
       matrix:
-        platform: [ubuntu-20.04, ubuntu-22.04, windows-latest, macos-latest]
+        platform: [ubuntu-22.04, ubuntu-24.04, windows-latest, macos-latest]
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -89,7 +89,7 @@ jobs:
   integration:
     strategy:
       matrix:
-        platform: [ubuntu-20.04, ubuntu-22.04, windows-latest, macos-latest]
+        platform: [ubuntu-22.04, ubuntu-24.04, windows-latest, macos-latest]
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
