@@ -54,7 +54,6 @@ Please follow these guidelines when committing code for this project:
 
 As an example:
 
-
     endpoints: support package attenuations
 
     Required in order to obtain credentials that apply only to a given package;

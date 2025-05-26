@@ -78,7 +78,7 @@ def _extract_on_clause_selectors(on_statement: str) -> set[str]:
     :return: Selectors found within the 'on' clause.
 
     For example:
-    >>> _extract_on_clause_selectors('on amd64,i386') == {'amd64', 'i386'}
+    >>> _extract_on_clause_selectors("on amd64,i386") == {"amd64", "i386"}
     True
     """
     match = _SELECTOR_PATTERN.match(on_statement)

@@ -16,7 +16,6 @@
 
 """Try Statement for Craft Grammar."""
 
-
 from overrides import overrides
 
 from ._base_processor import BaseProcessor
@@ -30,11 +29,11 @@ class TryStatement(Statement):
     >>> from snapcraft_legacy import ProjectOptions
     >>> from ._processor import GrammarProcessor
     >>> def checker(primitive):
-    ...     return 'invalid' not in primitive
+    ...     return "invalid" not in primitive
     >>> options = ProjectOptions()
     >>> processor = GrammarProcessor(None, options, checker)
-    >>> clause = TryStatement(body=['invalid'], processor=processor)
-    >>> clause.add_else(['valid'])
+    >>> clause = TryStatement(body=["invalid"], processor=processor)
+    >>> clause.add_else(["valid"])
     >>> clause.process()
     {'valid'}
     """
