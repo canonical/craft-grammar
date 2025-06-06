@@ -80,7 +80,7 @@ def _extract_to_clause_selectors(to_statement: str) -> set[str]:
     :return: Selectors found within the 'to' clause.
 
     For example:
-    >>> _extract_to_clause_selectors('to amd64,i386') == {'amd64', 'i386'}
+    >>> _extract_to_clause_selectors("to amd64,i386") == {"amd64", "i386"}
     True
     """
     match = _SELECTOR_PATTERN.match(to_statement)

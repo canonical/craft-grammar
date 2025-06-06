@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License along
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Types for grammar processing (not validation)."""
+
 from collections.abc import Sequence
 from typing import Any
 
