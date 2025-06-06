@@ -16,7 +16,6 @@
 
 """Try Statement for Craft Grammar."""
 
-
 from overrides import overrides
 
 from ._base_processor import BaseProcessor

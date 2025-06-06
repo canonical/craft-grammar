@@ -1,15 +1,5 @@
 {
-  "exclude": [
-    "**/__pycache__",
-    "**/.mypy_cache",
-    "**/.pytest_cache",
-    ".direnv",
-    ".tox",
-    "build",
-    "docs",
-    "venv",
-    ".venv"
-  ],
+  "exclude": ["**/__pycache__", "**/.mypy_cache", "**/.pytest_cache", ".direnv", ".tox", "build", "docs", "venv", ".venv"],
   "stubPath": "",
   "reportIncompatibleMethodOverride": "information"
 }

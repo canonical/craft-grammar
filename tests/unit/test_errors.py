@@ -44,6 +44,7 @@ scenarios = (
 
 @pytest.mark.parametrize("scenario", scenarios)
 def test_error_formatting(scenario):
-    assert str(scenario["exception_class"](*scenario["args"])) == (
-        scenario["expected_message"]
+    assert (
+        str(scenario["exception_class"](*scenario["args"]))
+        == (scenario["expected_message"])
     )
