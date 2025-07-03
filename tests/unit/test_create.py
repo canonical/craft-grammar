@@ -31,7 +31,7 @@ class MyModel(BaseModel):
     # Primitive types
     str_value: str
     str_value_or_none: str | None
-    optional_str_value: Optional[str]  # noqa: UP007 (non-pep604-annotation)
+    optional_str_value: Optional[str]  # noqa: UP045 (use of optional)
     str_with_default: str = "string"
     str_or_non_with_default: str | None = "string or None"
     union_value: Union[str, int, None]  # noqa: UP007 (non-pep604-annotation)
