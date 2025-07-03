@@ -292,9 +292,6 @@ ignore = [
 
     # Ignored due to common usage in current code
     "TRY003", # Avoid specifying long messages outside the exception class
-
-    # Craft Grammar specific entries
-    "PLW1641",# We don't really care about hashing grammar classes
 ]
 
 [tool.ruff.lint.flake8-annotations]
