@@ -25,6 +25,11 @@ scenarios = (
         "expected_message": "Invalid grammar syntax: syntax incorrect.",
     },
     {
+        "exception_class": errors.ForStatementSyntaxError,
+        "args": ["syntax incorrect"],
+        "expected_message": "Invalid grammar syntax: 'syntax incorrect' is not a valid 'for' clause.",
+    },
+    {
         "exception_class": errors.OnStatementSyntaxError,
         "args": ["syntax incorrect"],
         "expected_message": "Invalid grammar syntax: 'syntax incorrect' is not a valid 'on' clause.",

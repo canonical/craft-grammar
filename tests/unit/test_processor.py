@@ -364,3 +364,87 @@ def test_invalid_grammar(scenario):
         processor.process(grammar=scenario["grammar_entry"])
 
     assert re.match(scenario["expected_exception"], str(error.value))
+
+
+@pytest.mark.parametrize(
+    "grammar_entry",
+    [
+        pytest.param(
+            [{"for test-platform": ["foo"]}, {"on riscv64": "bar"}],
+            id="for-and-on",
+        ),
+        pytest.param(
+            [{"on riscv64": "bar"}, {"for test-platform": ["foo"]}],
+            id="on-and-for",
+        ),
+        pytest.param(
+            [{"for test-platform": ["foo"]}, {"to riscv64": "bar"}],
+            id="for-and-to",
+        ),
+        pytest.param(
+            [{"to riscv64": "bar"}, {"for test-platform": ["foo"]}],
+            id="to-and-for",
+        ),
+        pytest.param(
+            [{"for test-platform": ["foo"]}, {"else": "bar"}],
+            id="for-and-else",
+        ),
+        pytest.param(
+            [{"for test-platform": ["foo"]}, {"try": "bar"}],
+            id="for-and-try",
+        ),
+        pytest.param(
+            [{"try": "bar"}, {"for test-platform": ["foo"]}],
+            id="try-and-for",
+        ),
+        pytest.param(
+            [{"for test-platform": ["foo"]}, {"on riscv64 to amd64": "bar"}],
+            id="for-and-on-to",
+        ),
+        pytest.param(
+            [{"on riscv64 to amd64": "bar"}, {"for test-platform": ["foo"]}],
+            id="on-to-and-for",
+        ),
+        pytest.param(
+            [
+                {"on riscv64 to amd64": "bar"},
+                {"for test-platform": ["foo"]},
+                {"baz"},
+                {"to riscv64": "qux"},
+            ],
+            id="many-and-for",
+        ),
+        pytest.param(
+            [
+                {"for test-platform": ["foo"]},
+                {"on riscv64 to amd64": "bar"},
+                {"baz"},
+                {"to riscv64": "qux"},
+            ],
+            id="for-and-many",
+        ),
+    ],
+)
+def test_variant_error(grammar_entry):
+    """Error when multiple variants are used."""
+    processor = GrammarProcessor(
+        arch="amd64",
+        target_arch="amd64",
+        platforms=["test-platform"],
+        checker=lambda x: True,
+    )
+    # The order of 'to' and 'for' in the message depends
+    # on which is statement is processed first.
+    if "for" in next(iter(grammar_entry[0])):
+        expected_error = re.escape(
+            "Invalid grammar syntax: Two different variants of grammar are used, "
+            "the 'for' variant and 'to' variant. Only one variant can be used."
+        )
+    else:
+        expected_error = re.escape(
+            "Invalid grammar syntax: Two different variants of grammar are used, "
+            "the 'to' variant and 'for' variant. Only one variant can be used."
+        )
+
+    with pytest.raises(errors.GrammarSyntaxError, match=expected_error):
+        processor.process(grammar=grammar_entry)

@@ -21,7 +21,7 @@ import pytest
 from craft_grammar import GrammarProcessor, ToStatement, errors
 
 
-def test_on():
+def test_to():
     processor = GrammarProcessor(
         checker=lambda x: True,
         arch="amd64",
@@ -32,7 +32,7 @@ def test_on():
     assert clause.process() == ["foo"]
 
 
-def test_on_else():
+def test_to_else():
     processor = GrammarProcessor(
         checker=lambda x: True,
         arch="amd64",
@@ -44,7 +44,7 @@ def test_on_else():
     assert clause.process() == ["bar"]
 
 
-def test_on_else_fail():
+def test_to_else_fail():
     processor = GrammarProcessor(
         checker=lambda x: True,
         arch="amd64",
@@ -57,7 +57,7 @@ def test_on_else_fail():
         clause.process()
 
 
-def test_on_nested_else_with_valid_on_else():
+def test_to_nested_else_with_valid_to_else():
     processor = GrammarProcessor(
         checker=lambda x: True,
         arch="arm64",
@@ -70,7 +70,7 @@ def test_on_nested_else_with_valid_on_else():
     assert clause.process() == ["bar"]
 
 
-def test_on_nested_else_with_on_but_valid_else():
+def test_to_nested_else_with_to_but_valid_else():
     processor = GrammarProcessor(
         checker=lambda x: True,
         arch="i386",
@@ -83,7 +83,7 @@ def test_on_nested_else_with_on_but_valid_else():
     assert clause.process() == ["baz"]
 
 
-def test_on_missing():
+def test_to_missing():
     processor = GrammarProcessor(
         checker=lambda x: True,
         arch="amd64",

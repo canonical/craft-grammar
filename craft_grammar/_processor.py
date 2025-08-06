@@ -16,24 +16,40 @@
 
 """Craft Grammar's Processor implementation."""
 
+import enum
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from typing import Any
 
 from ._base_processor import BaseProcessor
 from ._compound import CompoundStatement
+from ._for import ForStatement
 from ._on import OnStatement
 from ._statement import CallStack, Grammar, Statement
 from ._to import ToStatement
 from ._try import TryStatement
 from .errors import GrammarSyntaxError
 
+_FOR_CLAUSE_PATTERN = re.compile(r"\Afor\s+")
 _ON_TO_CLAUSE_PATTERN = re.compile(r"(\Aon\s+\S+)\s+(to\s+\S+\Z)")
 _ON_CLAUSE_PATTERN = re.compile(r"\Aon\s+")
 _TO_CLAUSE_PATTERN = re.compile(r"\Ato\s+")
 _TRY_CLAUSE_PATTERN = re.compile(r"\Atry\Z")
 _ELSE_CLAUSE_PATTERN = re.compile(r"\Aelse\Z")
 _ELSE_FAIL_PATTERN = re.compile(r"\Aelse\s+fail\Z")
+
+
+class Variant(enum.Enum):
+    """The grammar variant or syntax style."""
+
+    UNKNOWN = "unknown"
+    """The variant is unknown or there is no grammar present."""
+
+    TO_VARIANT = "'to' variant"
+    """The variant that uses 'to <arch>', 'on <arch> to <arch>', 'try', 'else', and 'else fail' statements."""
+
+    FOR_VARIANT = "'for' variant"
+    """The variant that uses 'for <platform>' statements."""
 
 
 class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
@@ -45,6 +61,7 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
         checker: Callable[[Any], bool],
         arch: str,
         target_arch: str,
+        platforms: Iterable[str] | None = None,
         transformer: Callable[[list[Statement], str, str], str] | None = None,
     ) -> None:
         """Create a new GrammarProcessor.
@@ -53,12 +70,15 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
                         returning true if it is valid.
         :param arch: the architecture the system is on.
         :param target_arch: the architecture the system is to build for.
+        :param platforms: the platforms to build. Duplicates are ignored.
         :param transformer: callable accepting a call stack, single
                             primitive and arch, and returning a
                             transformed primitive.
         """
-        super().__init__(arch, target_arch)
+        super().__init__(arch, target_arch, platforms)
         self.checker = checker
+        # The variant is unknown until the grammar is processed.
+        self._variant = Variant.UNKNOWN
 
         if transformer:
             self._transformer = transformer
@@ -91,6 +111,7 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
                 # If the section is just a string, it's either "else fail" or a
                 # primitive name.
                 if _ELSE_FAIL_PATTERN.match(section):
+                    self._set_variant(Variant.TO_VARIANT)
                     _handle_else(statement, None)
                 else:
                     # Processing a string primitive indicates the previous section
@@ -143,6 +164,23 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
 
         return primitives
 
+    def _set_variant(self, variant: Variant) -> None:
+        """Set the grammar variant for the processor.
+
+        This prevents the processing of multiple variants.
+
+        :raises GrammarSyntaxError: If a different variant has already been processed.
+        """
+        if self._variant == Variant.UNKNOWN:
+            self._variant = variant
+            return
+
+        if self._variant != variant:
+            raise GrammarSyntaxError(
+                f"Two different variants of grammar are used, the {self._variant.value} and {variant.value}. "
+                "Only one variant can be used"
+            )
+
     @staticmethod
     def _process_statement(
         *,
@@ -177,6 +215,8 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
             on_to_clause_match = _ON_TO_CLAUSE_PATTERN.match(key)
             on_clause_match = _ON_CLAUSE_PATTERN.match(key)
             if on_to_clause_match:
+                self._set_variant(Variant.TO_VARIANT)
+
                 # We've come across the beginning of a compound statement
                 # with both 'on' and 'to'.
                 finalized_statement = _finalize(statement, finalized_statement)
@@ -211,6 +251,8 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
                 )
 
             elif on_clause_match:
+                self._set_variant(Variant.TO_VARIANT)
+
                 # We've come across the beginning of an 'on' statement.
                 # That means any previous statement we found is complete.
                 finalized_statement = _finalize(statement, finalized_statement)
@@ -222,8 +264,24 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
                     call_stack=call_stack,
                 )
 
+            elif _FOR_CLAUSE_PATTERN.match(key):
+                self._set_variant(Variant.FOR_VARIANT)
+
+                # We've come across the beginning of a 'for' statement.
+                # That means any previous statement we found is complete.
+                finalized_statement = _finalize(statement, finalized_statement)
+
+                statement = ForStatement(
+                    for_statement=key,
+                    body=value,
+                    processor=self,
+                    call_stack=call_stack,
+                )
+
             # to-do: remove support for to without on (this statement)
             elif _TO_CLAUSE_PATTERN.match(key):
+                self._set_variant(Variant.TO_VARIANT)
+
                 # We've come across the beginning of a 'to' statement.
                 # That means any previous statement we found is complete.
                 finalized_statement = _finalize(statement, finalized_statement)
@@ -236,6 +294,8 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
                 )
 
             elif _TRY_CLAUSE_PATTERN.match(key):
+                self._set_variant(Variant.TO_VARIANT)
+
                 # We've come across the beginning of a 'try' statement.
                 # That means any previous statement we found is complete.
                 finalized_statement = _finalize(statement, finalized_statement)
@@ -247,6 +307,8 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
                 )
 
             elif _ELSE_CLAUSE_PATTERN.match(key):
+                self._set_variant(Variant.TO_VARIANT)
+
                 _handle_else(statement, value)
             else:
                 # Since this section is a dictionary, if there are no
