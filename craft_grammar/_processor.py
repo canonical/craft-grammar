@@ -66,14 +66,15 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
     ) -> None:
         """Create a new GrammarProcessor.
 
-        :param checker: callable accepting a single primitive,
-                        returning true if it is valid.
-        :param arch: the architecture the system is on.
-        :param target_arch: the architecture the system is to build for.
-        :param platforms: the platforms to build. Duplicates are ignored.
-        :param transformer: callable accepting a call stack, single
-                            primitive and arch, and returning a
-                            transformed primitive.
+        :param checker: Callable accepting a single primitive, returning true if it is valid.
+        :param arch: The architecture the system is on. This is used as the selector for the
+                     'on' statement.
+        :param target_arch: The architecture the system is to build for. This is the selector
+                            for the 'to' statement.
+        :param platforms: The identifiers for the current platform to build. These are the
+                          selectors for the 'for' statement. Duplicates are ignored.
+        :param transformer: Callable accepting a call stack, single primitive and arch, and
+                            returning a transformed primitive.
         """
         super().__init__(arch, target_arch, platforms)
         self.checker = checker
@@ -177,8 +178,9 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
 
         if self._variant != variant:
             raise GrammarSyntaxError(
-                f"Two different variants of grammar are used, the {self._variant.value} and {variant.value}. "
-                "Only one variant can be used"
+                "The 'for' statement can't be used with other grammar statements. "
+                "Either replace all 'for <platform>' statements with 'to <arch>' or "
+                "remove all other grammar statements"
             )
 
     @staticmethod

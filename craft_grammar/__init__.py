@@ -41,6 +41,7 @@ __all__ = [
     "errors",
     "CallStack",
     "CompoundStatement",
+    "ForStatement",
     "Grammar",
     "GrammarProcessor",
     "OnStatement",

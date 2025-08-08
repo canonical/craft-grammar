@@ -112,11 +112,10 @@ def test_for_else_error():
 
 @pytest.mark.parametrize(
     ("statement", "expected_error"),
-    # spaces in selectors
     [
         pytest.param(
             "for test platform",
-            "spaces are not allowed in the selectors",
+            "spaces are not allowed in the selector",
             id="spaces in selectors",
         ),
         pytest.param(
@@ -136,12 +135,12 @@ def test_for_else_error():
         ),
         pytest.param(
             "for",
-            "selectors are missing",
+            "selector is missing",
             id="invalid selector format",
         ),
         pytest.param(
             "im-invalid",
-            "selectors are missing",
+            "selector is missing",
             id="not even close",
         ),
     ],

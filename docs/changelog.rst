@@ -18,12 +18,12 @@ Changelog
 
 .. _release 2.1.0:
 
-2.1.0 (2025-08-06)
+2.1.0 (2025-MM-DD)
 ------------------
 
 New features:
 
-- Add a new 'for' statement to select against a platform.
+- Add a new ``for`` statement to select against a platform.
 
 For a complete list of commits, check out the `2.1.0`_ release on GitHub.
 

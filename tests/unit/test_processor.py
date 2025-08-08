@@ -423,6 +423,14 @@ def test_invalid_grammar(scenario):
             ],
             id="for-and-many",
         ),
+        pytest.param(
+            [{"for test-platform": {"on amd64 to amd64": "bar"}}],
+            id="nested-for-on-to",
+        ),
+        pytest.param(
+            [{"on amd64 to amd64": [{"for test-platform": "bar"}]}],
+            id="nested-on-to-for",
+        ),
     ],
 )
 def test_variant_error(grammar_entry):
@@ -433,18 +441,11 @@ def test_variant_error(grammar_entry):
         platforms=["test-platform"],
         checker=lambda x: True,
     )
-    # The order of 'to' and 'for' in the message depends
-    # on which is statement is processed first.
-    if "for" in next(iter(grammar_entry[0])):
-        expected_error = re.escape(
-            "Invalid grammar syntax: Two different variants of grammar are used, "
-            "the 'for' variant and 'to' variant. Only one variant can be used."
-        )
-    else:
-        expected_error = re.escape(
-            "Invalid grammar syntax: Two different variants of grammar are used, "
-            "the 'to' variant and 'for' variant. Only one variant can be used."
-        )
+    expected_error = re.escape(
+        "Invalid grammar syntax: The 'for' statement can't be used with other "
+        "grammar statements. Either replace all 'for <platform>' statements with "
+        "'to <arch>' or remove all other grammar statements."
+    )
 
     with pytest.raises(errors.GrammarSyntaxError, match=expected_error):
         processor.process(grammar=grammar_entry)

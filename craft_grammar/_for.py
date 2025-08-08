@@ -103,7 +103,7 @@ def _extract_for_clause_selectors(for_statement: str) -> set[str]:
     """
     match = _SELECTOR_PATTERN.match(for_statement)
     if match is None:
-        raise ForStatementSyntaxError(for_statement, message="selectors are missing")
+        raise ForStatementSyntaxError(for_statement, message="selector is missing")
 
     try:
         selector_group = match.group(1)
@@ -115,7 +115,7 @@ def _extract_for_clause_selectors(for_statement: str) -> set[str]:
     if _WHITESPACE_PATTERN.match(selector_group):
         raise ForStatementSyntaxError(
             for_statement,
-            message="spaces are not allowed in the selectors",
+            message="spaces are not allowed in the selector",
         )
 
     # Raise a friendly error for commas since other grammar statements allow commas.
