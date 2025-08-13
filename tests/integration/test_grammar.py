@@ -23,7 +23,9 @@ import pytest
 import yaml
 from craft_grammar import GrammarProcessor, errors
 
-DATA_FILES_PATH = pathlib.Path(__file__).parent / "data"
+_DATA_FILES_PATH = pathlib.Path(__file__).parent / "data"
+VALID_DATA_FILES_PATH = _DATA_FILES_PATH / "valid"
+INVALID_DATA_FILES_PATH = _DATA_FILES_PATH / "invalid"
 
 
 # Values that should return as a single object / list / dict.
@@ -79,9 +81,9 @@ def process_data(
 @pytest.mark.parametrize("platform", ["platform1", "platform2", "platform3"])
 def test_for(platform):
     """Process the `for` statement."""
-    data = yaml.safe_load((DATA_FILES_PATH / "for.yaml").read_text())
+    data = yaml.safe_load((VALID_DATA_FILES_PATH / "for.yaml").read_text())
     expected_data = yaml.safe_load(
-        (DATA_FILES_PATH / f"for.for-{platform}.yaml").read_text()
+        (VALID_DATA_FILES_PATH / f"for.for-{platform}.yaml").read_text()
     )
     processor = GrammarProcessor(
         checker=self_check, arch="amd64", target_arch="riscv64", platforms=[platform]
@@ -102,9 +104,11 @@ def test_for(platform):
 )
 def test_on_to(arch, target_arch):
     """Process `on` and `to` statements."""
-    data = yaml.safe_load((DATA_FILES_PATH / "on-and-to.yaml").read_text())
+    data = yaml.safe_load((VALID_DATA_FILES_PATH / "on-and-to.yaml").read_text())
     expected_data = yaml.safe_load(
-        (DATA_FILES_PATH / f"on-and-to.on-{arch}-to-{target_arch}.yaml").read_text()
+        (
+            VALID_DATA_FILES_PATH / f"on-and-to.on-{arch}-to-{target_arch}.yaml"
+        ).read_text()
     )
     processor = GrammarProcessor(checker=self_check, arch=arch, target_arch=target_arch)
 
@@ -123,7 +127,7 @@ def test_on_to(arch, target_arch):
 )
 def test_variant_error(filename):
     """Error when two variants of grammar are used."""
-    data = yaml.safe_load((DATA_FILES_PATH / f"{filename}.yaml").read_text())
+    data = yaml.safe_load((INVALID_DATA_FILES_PATH / f"{filename}.yaml").read_text())
     expected_error = re.escape(
         "Invalid grammar syntax: The 'for' statement can't be used with other grammar statements."
     )
