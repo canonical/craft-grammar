@@ -1,0 +1,8 @@
+plugin: nil
+source-branch: branch1
+build-packages:
+  - package1
+  - package3
+organize:
+  file1: file2
+  file3: file4
