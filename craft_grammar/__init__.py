@@ -18,6 +18,7 @@
 
 from . import errors
 from ._compound import CompoundStatement
+from ._for import ForStatement
 from ._on import OnStatement
 from ._processor import GrammarProcessor
 from ._statement import CallStack, Grammar, Statement
@@ -40,6 +41,7 @@ __all__ = [
     "errors",
     "CallStack",
     "CompoundStatement",
+    "ForStatement",
     "Grammar",
     "GrammarProcessor",
     "OnStatement",

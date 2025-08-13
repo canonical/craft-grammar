@@ -1,0 +1,47 @@
+# no grammar
+plugin: nil
+
+# string
+source-branch:
+  - on amd64 to riscv64: branch1
+  - on amd64 to s390x: branch2
+  - branch3
+
+# list
+build-packages:
+  - on amd64:
+      - package1
+      - to riscv64:
+          - package2
+  - to riscv64:
+      - package3
+  - on amd64 to riscv64:
+      - package4
+  - on s390x:
+      - package5
+      - to s390x:
+          - package6
+  - to s390x:
+      - package7
+  - on s390x to s390x:
+      - package8
+  - package9
+
+# dict
+organize:
+  - on amd64:
+      - file1: file1
+      - to riscv64:
+          - file2: file2
+  - to riscv64:
+      - file3: file3
+  - on amd64 to riscv64:
+      - file4: file4
+  - on s390x:
+      - file5: file5
+      - to s390x:
+          - file6: file6
+  - to s390x:
+      - file7: file7
+  - on s390x to s390x:
+      - file8: file8

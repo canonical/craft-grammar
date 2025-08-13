@@ -14,7 +14,7 @@
 """Base abstraction for a grammar processor."""
 
 import abc
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from typing import Any
 
 from ._types import Grammar
@@ -25,9 +25,12 @@ class BaseProcessor(abc.ABC):
 
     checker: Callable[[Any], bool]
 
-    def __init__(self, arch: str, target_arch: str) -> None:
+    def __init__(
+        self, arch: str, target_arch: str, platforms: Iterable[str] | None = None
+    ) -> None:
         self.arch = arch
         self.target_arch = target_arch
+        self.platforms: set[str] = set(platforms) if platforms else set()
 
     @abc.abstractmethod
     def process(

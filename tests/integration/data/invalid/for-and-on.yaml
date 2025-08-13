@@ -1,0 +1,13 @@
+# invalid data - 'for' and 'to' are both present
+
+# no grammar
+plugin: nil
+
+source-branch:
+  - for platform1: branch1
+  - branch2
+
+build-packages:
+  - to riscv64:
+      - package1
+  - package2

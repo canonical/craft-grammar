@@ -1,0 +1,5 @@
+plugin: nil
+source-branch: branch3
+build-packages:
+  - package3
+organize:

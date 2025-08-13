@@ -1,6 +1,31 @@
-*********
 Changelog
-*********
+=========
+
+.. changelog template:
+
+  .. _release-X.Y.Z:
+
+  X.Y.Z (YYYY-MM-DD)
+  ------------------
+
+  New features:
+
+  Bug fixes:
+
+  Documentation:
+
+  For a complete list of commits, check out the `X.Y.Z`_ release on GitHub.
+
+.. _release 2.1.0:
+
+2.1.0 (2025-08-13)
+------------------
+
+New features:
+
+- Add a new ``for`` statement to select against a platform.
+
+For a complete list of commits, check out the `2.1.0`_ release on GitHub.
 
 2.0.3 (2024-03-14)
 ------------------
@@ -55,3 +80,5 @@ Features:
 - Initial import from Snapcraft
 - Initial packaging
 - Code updated to follow latest development practices
+
+.. _2.1.0: https://github.com/canonical/craft-grammar/releases/tag/2.1.0

@@ -28,6 +28,16 @@ class GrammarSyntaxError(CraftGrammarError):
         super().__init__(f"Invalid grammar syntax: {message}.")
 
 
+class ForStatementSyntaxError(GrammarSyntaxError):
+    """Error raised on 'for' statement syntax errors."""
+
+    def __init__(self, for_statement: str, *, message: str | None = None) -> None:
+        components = [f"{for_statement!r} is not a valid 'for' clause"]
+        if message:
+            components.append(message)
+        super().__init__(message=": ".join(components))
+
+
 class OnStatementSyntaxError(GrammarSyntaxError):
     """Error raised on on statement syntax errors."""
 
