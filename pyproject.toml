@@ -32,7 +32,7 @@ docs = [
     "sphinx-toolbox>=4.0",
     "sphinx-lint~=1.0",
     "sphinxext-rediraffe==0.2.7",
-    "sphinx-autodoc-typehints~=2.1",
+    "sphinx-autodoc-typehints~=3.2",
 ]
 dev = [
     "build>=0.7.0",
