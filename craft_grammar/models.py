@@ -30,6 +30,7 @@ from pydantic_core import core_schema
 
 _on_pattern = re.compile(r"^on\s+(.+)\s*$")
 _to_pattern = re.compile(r"^to\s+(.+)\s*$")
+_for_pattern = re.compile(r"^for\s+(.+)\s*$")
 _compound_pattern = re.compile(r"^on\s+(.+)\s+to\s+(.+)\s*$")
 
 _ELSE_FAIL = "else fail"
@@ -246,6 +247,10 @@ def _ensure_selector_valid(selector: str, *, clause: str) -> None:
     if " " in selector:
         raise ValueError(f"spaces are not allowed in {clause!r} selector")
 
+    # commas are not allowed in 'for' selectors
+    if clause == "for" and "," in selector:
+        raise ValueError(f"commas are not allowed in {clause!r} selector")
+
     # selector items should be separated by comma
     if selector.startswith(",") or selector.endswith(",") or ",," in selector:
         raise ValueError(f"syntax error in {clause!r} selector")
@@ -287,6 +292,11 @@ def _is_grammar_clause(item: Any) -> bool:  # noqa: PLR0911 (too-many-return-sta
     res = _to_pattern.match(key)
     if res:
         _ensure_selector_valid(res.group(1), clause="to")
+        return True
+
+    res = _for_pattern.match(key)
+    if res:
+        _ensure_selector_valid(res.group(1), clause="for")
         return True
 
     return False

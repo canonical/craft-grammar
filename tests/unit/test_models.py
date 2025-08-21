@@ -84,7 +84,8 @@ def test_validate_grammar_trivial():
     assert v.grammar_annotated == {"thing": 123}
 
 
-def test_validate_grammar_simple():
+def test_validate_on_to_grammar_simple():
+    """Validate the 'on/to' variant of grammar."""
     data = yaml.safe_load(
         textwrap.dedent(
             """
@@ -179,6 +180,86 @@ def test_validate_grammar_simple():
         {
             "*else": {
                 "what": 0,
+            },
+        },
+    ]
+
+
+def test_validate_for_grammar_simple():
+    """Validate the 'for' variant of grammar."""
+    data = yaml.safe_load(
+        textwrap.dedent(
+            """
+            control: a string
+            grammar_bool:
+              - for platform1: true
+            grammar_int:
+              - for platform1: 42
+            grammar_float:
+              - for platform1: 3.14
+            grammar_str:
+              - for platform1: another string
+            grammar_strlist:
+              - for platform1:
+                  - a
+                  - string
+                  - list
+            grammar_dict:
+              - for platform1:
+                  key: value
+                  other_key: other_value
+            grammar_dictlist:
+              - for platform1:
+                 - key: value
+                   other_key: other_value
+                 - key2: value
+                   other_key2: other_value
+            grammar_annotated:
+              - for platform1:
+                  thing: 64
+              - for platform2:
+                  riscy: 64
+            """,
+        ),
+    )
+
+    v = ValidationTest.model_validate(data)
+    assert v.control == "a string"
+    assert v.grammar_bool == [
+        {"*for platform1": True},
+    ]
+    assert v.grammar_int == [
+        {"*for platform1": 42},
+    ]
+    assert v.grammar_float == [
+        {"*for platform1": 3.14},
+    ]
+    assert v.grammar_str == [
+        {"*for platform1": "another string"},
+    ]
+    assert v.grammar_strlist == [
+        {"*for platform1": ["a", "string", "list"]},
+    ]
+    assert v.grammar_dict == [
+        {"*for platform1": {"key": "value", "other_key": "other_value"}},
+    ]
+    assert v.grammar_dictlist == [
+        {
+            "*for platform1": [
+                {"key": "value", "other_key": "other_value"},
+                {"key2": "value", "other_key2": "other_value"},
+            ],
+        },
+    ]
+    assert v.grammar_annotated == [
+        {
+            "*for platform1": {
+                "thing": 64,
+            },
+        },
+        {
+            "*for platform2": {
+                "riscy": 64,
             },
         },
     ]
@@ -512,6 +593,13 @@ def test_grammar_try():
         ("on a to b,,b", "syntax error in 'on ... to' selector"),
         ("on a, a to b", "spaces are not allowed in 'on ... to' selector"),
         ("on a to b, b", "spaces are not allowed in 'on ... to' selector"),
+        ("for", "value must be a str or valid grammar dict: [{'for': 'foo'}]"),
+        ("for ,", "commas are not allowed in 'for' selector"),
+        ("for ,platform1", "commas are not allowed in 'for' selector"),
+        ("for platform1,", "commas are not allowed in 'for' selector"),
+        ("for platform1,,platform1", "commas are not allowed in 'for' selector"),
+        ("for platform1, platform2", "spaces are not allowed in 'for' selector"),
+        ("for platform1 platform2", "spaces are not allowed in 'for' selector"),
     ],
 )
 def test_grammar_errors(clause, err_msg):

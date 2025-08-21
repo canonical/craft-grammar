@@ -1,5 +1,5 @@
 plugin: nil
-source-branch: branch3
+source-branch:
 build-packages:
   - package3
 organize:
