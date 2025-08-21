@@ -16,6 +16,17 @@ Changelog
 
   For a complete list of commits, check out the `X.Y.Z`_ release on GitHub.
 
+.. _release 2.1.1:
+
+2.1.1 (2025-MM-DD)
+------------------
+
+New features:
+
+- Add a validator for the ``for`` statement in Grammar models.
+
+For a complete list of commits, check out the `2.1.1`_ release on GitHub.
+
 .. _release 2.1.0:
 
 2.1.0 (2025-08-13)
@@ -82,3 +93,4 @@ Features:
 - Code updated to follow latest development practices
 
 .. _2.1.0: https://github.com/canonical/craft-grammar/releases/tag/2.1.0
+.. _2.1.1: https://github.com/canonical/craft-grammar/releases/tag/2.1.1
