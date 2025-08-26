@@ -16,16 +16,16 @@ Changelog
 
   For a complete list of commits, check out the `X.Y.Z`_ release on GitHub.
 
-.. _release 2.1.1:
+.. _release 2.2.0:
 
-2.1.1 (2025-MM-DD)
+2.2.0 (2025-08-26)
 ------------------
 
 New features:
 
 - Add a validator for the ``for`` statement in Grammar models.
 
-For a complete list of commits, check out the `2.1.1`_ release on GitHub.
+For a complete list of commits, check out the `2.2.0`_ release on GitHub.
 
 .. _release 2.1.0:
 
