@@ -93,4 +93,4 @@ Features:
 - Code updated to follow latest development practices
 
 .. _2.1.0: https://github.com/canonical/craft-grammar/releases/tag/2.1.0
-.. _2.1.1: https://github.com/canonical/craft-grammar/releases/tag/2.1.1
+.. _2.2.0: https://github.com/canonical/craft-grammar/releases/tag/2.2.0
