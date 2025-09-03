@@ -22,6 +22,7 @@ from typing import Any, cast
 import pytest
 import yaml
 from craft_grammar import GrammarProcessor, errors
+from craft_grammar._processor import Variant
 
 _DATA_FILES_PATH = pathlib.Path(__file__).parent / "data"
 VALID_DATA_FILES_PATH = _DATA_FILES_PATH / "valid"
@@ -61,17 +62,39 @@ def process_data(
         # grammar aware models can be a string
         elif isinstance(unprocessed_grammar, str):
             unprocessed_grammar = [unprocessed_grammar]
+        elif isinstance(unprocessed_grammar, dict):
+            pass
         # skip all other data types
         else:
             continue
 
         processed_grammar = processor.process(grammar=unprocessed_grammar)
 
-        # special cases:
-        # - scalar values should return as a single object, not in a list.
-        # - dict values should return as a dict, not in a list.
-        if key not in NON_SCALAR_VALUES or key in DICT_ONLY_VALUES:
-            processed_grammar = processed_grammar[0] if processed_grammar else None  # type: ignore[assignment]
+        match processor.variant:
+            case Variant.TO_VARIANT:
+                # special cases:
+                # - scalar values should return as a single object, not in a list.
+                # - dict values should return as a dict, not in a list.
+                if key not in NON_SCALAR_VALUES or key in DICT_ONLY_VALUES:
+                    processed_grammar = (
+                        processed_grammar[0] if processed_grammar else None
+                    )  # type: ignore[assignment]
+            case _:
+                # special cases:
+                # - scalar values should return as a single object, not in a list.
+                # - dict values should return as a  merged dict, not in a list.
+                if key in DICT_ONLY_VALUES:
+                    if not processed_grammar:
+                        processed_grammar = None
+                    else:
+                        # TODO: Fail on duplicate keys
+                        processed_grammar = {
+                            k: v for d in processed_grammar for k, v in d.items()
+                        }
+                elif key not in NON_SCALAR_VALUES:
+                    processed_grammar = (
+                        processed_grammar[0] if processed_grammar else None
+                    )  # type: ignore[assignment]
 
         data[key] = processed_grammar
 

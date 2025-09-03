@@ -16,9 +16,10 @@ build-packages:
 
 # dict
 organize:
-  - for platform1:
-      file1: file2
-      file3: file4
-  - for platform2:
-      file4: file5
-      file6: file7
+  for platform1:
+    file1: file2
+    file3: file4
+  for platform2:
+    file4: file5
+    file6: file7
+  always: over_here

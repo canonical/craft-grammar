@@ -87,6 +87,10 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
             # By default, no transformation
             self._transformer = lambda _s, p, _o: p
 
+    @property
+    def variant(self) -> Variant:
+        return self._variant
+
     def process(
         self,
         *,
@@ -106,6 +110,11 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
         primitives: list[Any] = []
         statements = _StatementCollection()
         statement: Statement | None = None
+
+        grammar_is_dict = False
+        if isinstance(grammar, dict):
+            grammar = [{key: value} for key, value in grammar.items()]
+            grammar_is_dict = True
 
         for section in grammar:
             if isinstance(section, str):
@@ -132,7 +141,6 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
                     section=section,
                     statement=statement,
                 )
-
                 # Process any finalized statement (if any).
                 if finalized_statement is not None:
                     self._process_statement(
@@ -372,3 +380,6 @@ class _StatementCollection:  # pylint: disable=too-few-public-methods
             )
 
         self._statements.append(statement)
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(_statements={self._statements!r})"
