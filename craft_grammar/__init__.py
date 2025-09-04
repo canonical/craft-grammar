@@ -20,7 +20,7 @@ from . import errors
 from ._compound import CompoundStatement
 from ._for import ForStatement
 from ._on import OnStatement
-from ._processor import GrammarProcessor
+from ._processor import GrammarProcessor, Variant
 from ._statement import CallStack, Grammar, Statement
 from ._to import ToStatement
 from ._try import TryStatement
@@ -48,5 +48,6 @@ __all__ = [
     "Statement",
     "ToStatement",
     "TryStatement",
+    "Variant",
     "create_grammar_model",
 ]

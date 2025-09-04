@@ -18,8 +18,10 @@
 
 import enum
 import re
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Collection
 from typing import Any
+
+from typing_extensions import override
 
 from ._base_processor import BaseProcessor
 from ._compound import CompoundStatement
@@ -55,13 +57,14 @@ class Variant(enum.Enum):
 class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
     """The GrammarProcessor extracts desired primitives from grammar."""
 
+    @override
     def __init__(
         self,
         *,
         checker: Callable[[Any], bool],
         arch: str,
         target_arch: str,
-        platforms: Iterable[str] | None = None,
+        platforms: Collection[str] | None = None,
         transformer: Callable[[list[Statement], str, str], str] | None = None,
     ) -> None:
         """Create a new GrammarProcessor.
@@ -182,6 +185,10 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
                 "Either replace all 'for <platform>' statements with 'to <arch>' or "
                 "remove all other grammar statements"
             )
+
+    @property
+    def variant(self) -> Variant:
+        return self._variant
 
     @staticmethod
     def _process_statement(

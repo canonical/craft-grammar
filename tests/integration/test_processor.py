@@ -21,7 +21,7 @@ from typing import Any, cast
 
 import pytest
 import yaml
-from craft_grammar import GrammarProcessor, errors
+from craft_grammar import GrammarProcessor, Variant, errors
 
 _DATA_FILES_PATH = pathlib.Path(__file__).parent / "data"
 VALID_DATA_FILES_PATH = _DATA_FILES_PATH / "valid"
@@ -67,10 +67,19 @@ def process_data(
 
         processed_grammar = processor.process(grammar=unprocessed_grammar)
 
-        # special cases:
-        # - scalar values should return as a single object, not in a list.
-        # - dict values should return as a dict, not in a list.
-        if key not in NON_SCALAR_VALUES or key in DICT_ONLY_VALUES:
+        if processor.variant == Variant.FOR_VARIANT:
+            # special cases:
+            # - scalar values should return as a single object, not in a list.
+            # - dict values should return as a dict, not in a list.
+            if key in DICT_ONLY_VALUES:
+                processed_grammar = {
+                    k: v for d in processed_grammar for k, v in d.items()
+                }
+                if not processed_grammar:
+                    processed_grammar = None
+            elif key not in NON_SCALAR_VALUES:
+                processed_grammar = processed_grammar[0] if processed_grammar else None  # type: ignore[assignment]
+        elif key not in NON_SCALAR_VALUES or key in DICT_ONLY_VALUES:
             processed_grammar = processed_grammar[0] if processed_grammar else None  # type: ignore[assignment]
 
         data[key] = processed_grammar

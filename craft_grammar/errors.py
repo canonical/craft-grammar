@@ -21,6 +21,17 @@ class CraftGrammarError(Exception):
     """Base class error for craft-grammar."""
 
 
+class PlatformNameError(CraftGrammarError):
+    """Error raised if a platform name is invalid."""
+
+    def __init__(self, *platform: str) -> None:
+        if len(platform) == 1:
+            super().__init__(f"Invalid platform name: '{platform[0]}'")
+        else:
+            platforms_str = "', '".join(platform)
+            super().__init__(f"Invalid platform names: '{platforms_str}'")
+
+
 class GrammarSyntaxError(CraftGrammarError):
     """Error raised on grammar syntax errors."""
 

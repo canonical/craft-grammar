@@ -22,3 +22,5 @@ organize:
   - "*for platform2":
       file4: file5
       file6: file7
+  - "*for any":
+      always-organize: to-here
