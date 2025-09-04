@@ -68,6 +68,7 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
         transformer: Callable[[list[Statement], str, str], str] | None = None,
         valid_platforms: Collection[str] | None = None,
         valid_architectures: Collection[str] | None = None,
+        variant: Variant = Variant.UNKNOWN,
     ) -> None:
         """Create a new GrammarProcessor.
 
@@ -80,6 +81,11 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
                           selectors for the 'for' statement. Duplicates are ignored.
         :param transformer: Callable accepting a call stack, single primitive and arch, and
                             returning a transformed primitive.
+        :param valid_platforms: If given, a collection of platform names that are valid
+            as the object of "for" statements.
+        :param valid_arch: If given, a collection of architecture names that are valid
+            as the object of "on" or "to" statements.
+        :param variant: The grammar variant to use. Defaults to auto-detecting.
         """
         super().__init__(
             arch,
@@ -89,8 +95,7 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
             valid_architectures=valid_architectures,
         )
         self.checker = checker
-        # The variant is unknown until the grammar is processed.
-        self._variant = Variant.UNKNOWN
+        self._variant = variant
 
         if transformer:
             self._transformer = transformer
