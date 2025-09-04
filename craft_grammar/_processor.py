@@ -63,7 +63,7 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
         *,
         checker: Callable[[Any], bool] = lambda _: True,
         arch: str,
-        target_arch: str,
+        target_arch: str | None = None,
         platforms: Collection[str] | None = None,
         transformer: Callable[[list[Statement], str, str], str] | None = None,
         valid_platforms: Collection[str] | None = None,
@@ -95,7 +95,13 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
             valid_architectures=valid_architectures,
         )
         self.checker = checker
-        self._variant = variant
+        if variant == Variant.UNKNOWN and None in (target_arch, platforms):
+            if target_arch is None:
+                self._variant = Variant.FOR_VARIANT
+            elif platforms is None:
+                self._variant = Variant.TO_VARIANT
+        else:
+            self._variant = variant
 
         if transformer:
             self._transformer = transformer
