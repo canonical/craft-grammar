@@ -23,7 +23,11 @@ from overrides import overrides
 
 from ._base_processor import BaseProcessor
 from ._statement import CallStack, Grammar, Statement
-from .errors import ForStatementSyntaxError, GrammarSyntaxError
+from .errors import (
+    ForStatementSyntaxError,
+    GrammarSyntaxError,
+    UnknownPlatformNameError,
+)
 
 # captures the selector 'platform1' from 'for platform1'
 _SELECTOR_PATTERN = re.compile(r"\Afor\s+(.+)\Z")
@@ -57,6 +61,10 @@ class ForStatement(Statement):
         super().__init__(body=body, processor=processor, call_stack=call_stack)
 
         self.selectors = _extract_for_clause_selectors(for_statement)
+        if processor.valid_platforms is not None:
+            for selector in self.selectors:
+                if selector not in processor.valid_platforms:
+                    raise UnknownPlatformNameError(selector)
 
     @overrides
     def check(self) -> bool:
