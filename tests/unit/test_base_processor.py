@@ -13,12 +13,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Unit tests for the base processor."""
 
-from typing import Any, override
-
 import pytest
 from craft_grammar._base_processor import BaseProcessor
 from craft_grammar._types import Grammar
 from craft_grammar.errors import PlatformNameError
+from typing_extensions import Any, override
 
 
 class _StubProcessor(BaseProcessor):
