@@ -24,11 +24,11 @@ class CraftGrammarError(Exception):
 class PlatformNameError(CraftGrammarError):
     """Error raised if a platform name is invalid."""
 
-    def __init__(self, *platform: str) -> None:
-        if len(platform) == 1:
-            super().__init__(f"Invalid platform name: '{platform[0]}'")
+    def __init__(self, *platforms: str) -> None:
+        if len(platforms) == 1:
+            super().__init__(f"Invalid platform name: '{platforms[0]}'")
         else:
-            platforms_str = "', '".join(platform)
+            platforms_str = "', '".join(platforms)
             super().__init__(f"Invalid platform names: '{platforms_str}'")
 
 
