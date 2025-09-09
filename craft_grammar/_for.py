@@ -60,8 +60,10 @@ class ForStatement(Statement):
 
     @overrides
     def check(self) -> bool:
-        return (len(self.selectors) == 1) and (
-            self.selectors.issubset(self._processor.platforms)
+        return (
+            self._processor.platforms is not None
+            and (len(self.selectors) == 1)
+            and (self.selectors.issubset(self._processor.platforms))
         )
 
     @overrides
