@@ -142,7 +142,7 @@ class Statement(metaclass=ABCMeta):
         return call_stack
 
     def __repr__(self) -> str:
-        return "{self.__str__()!r}"
+        return f"{self.__str__()!r}"
 
     @abstractmethod
     def check(self) -> bool:

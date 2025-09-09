@@ -18,5 +18,5 @@
 from collections.abc import Sequence
 from typing import Any
 
-Grammar = Sequence[str | dict[str, Any]]
+Grammar = Sequence[str | dict[str, Any]] | dict[str, Any]
 """Grammar type."""
