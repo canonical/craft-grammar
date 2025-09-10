@@ -34,7 +34,7 @@ class BaseProcessor(abc.ABC):
         platforms: Collection[str] | None = None,
         *,
         valid_platforms: Collection[str] | None = None,
-        valid_arch: Collection[str] | None = None,
+        valid_architectures: Collection[str] | None = None,
     ) -> None:
         self.arch = arch
         self.target_arch = target_arch
@@ -42,7 +42,7 @@ class BaseProcessor(abc.ABC):
             raise PlatformNameError("any")
         self.platforms = None if platforms is None else {"any"} | set(platforms)
         self.valid_platforms = valid_platforms
-        self.valid_arch = valid_arch
+        self.valid_architectures = valid_architectures
 
     @abc.abstractmethod
     def process(

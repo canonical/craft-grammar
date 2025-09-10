@@ -52,9 +52,9 @@ class ToStatement(Statement):
         super().__init__(body=body, processor=processor, call_stack=call_stack)
 
         self.selectors = _extract_to_clause_selectors(to_statement)
-        if processor.valid_arch is not None:
+        if processor.valid_architectures is not None:
             for selector in self.selectors:
-                if selector not in processor.valid_arch:
+                if selector not in processor.valid_architectures:
                     raise UnknownArchitectureError(selector)
 
     @overrides

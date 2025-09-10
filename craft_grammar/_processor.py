@@ -67,7 +67,7 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
         platforms: Collection[str] | None = None,
         transformer: Callable[[list[Statement], str, str], str] | None = None,
         valid_platforms: Collection[str] | None = None,
-        valid_arch: Collection[str] | None = None,
+        valid_architectures: Collection[str] | None = None,
     ) -> None:
         """Create a new GrammarProcessor.
 
@@ -86,7 +86,7 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
             target_arch,
             platforms,
             valid_platforms=valid_platforms,
-            valid_arch=valid_arch,
+            valid_architectures=valid_architectures,
         )
         self.checker = checker
         # The variant is unknown until the grammar is processed.

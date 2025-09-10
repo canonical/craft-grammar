@@ -174,7 +174,7 @@ def test_unknown_arch_name():
         target_arch="riscv64",
         platforms=["test-platform"],
         checker=lambda x: "invalid" not in x,
-        valid_arch=["amd64", "riscv64"],
+        valid_architectures=["amd64", "riscv64"],
     )
     with pytest.raises(errors.UnknownArchitectureError):
         ToStatement(to_statement="to s390x", body=["foo"], processor=processor)
