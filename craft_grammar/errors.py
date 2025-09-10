@@ -32,6 +32,20 @@ class PlatformNameError(CraftGrammarError):
             super().__init__(f"Invalid platform names: '{platforms_str}'")
 
 
+class UnknownPlatformNameError(CraftGrammarError):
+    """Error raised if for statement contains an unknown platform name."""
+
+    def __init__(self, platform: str) -> None:
+        super().__init__(f"Unknown platform name: {platform!r}")
+
+
+class UnknownArchitectureError(CraftGrammarError):
+    """Error raised if on or to statement contains an unknown architecture name."""
+
+    def __init__(self, arch: str) -> None:
+        super().__init__(f"Unknown architecture: {arch!r}")
+
+
 class GrammarSyntaxError(CraftGrammarError):
     """Error raised on grammar syntax errors."""
 

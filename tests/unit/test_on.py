@@ -166,3 +166,15 @@ def test_errors(scenario):
         statement.process()
 
     assert re.match(scenario["expected_exception"], str(syntax_error.value))
+
+
+def test_unknown_arch_name():
+    processor = GrammarProcessor(
+        arch="amd64",
+        target_arch="riscv64",
+        platforms=["test-platform"],
+        checker=lambda x: "invalid" not in x,
+        valid_architectures=["amd64", "riscv64"],
+    )
+    with pytest.raises(errors.UnknownArchitectureError):
+        OnStatement(on_statement="on s390x", body=["foo"], processor=processor)

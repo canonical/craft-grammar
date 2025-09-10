@@ -164,3 +164,17 @@ def test_errors(statement, expected_error):
             body=["foo"],
             processor=processor,
         )
+
+
+def test_unknown_platform_name():
+    processor = GrammarProcessor(
+        arch="amd64",
+        target_arch="riscv64",
+        platforms=["test-platform"],
+        checker=lambda x: "invalid" not in x,
+        valid_platforms=["test-platform", "other-platform"],
+    )
+    with pytest.raises(errors.UnknownPlatformNameError):
+        ForStatement(
+            for_statement="for invalid-platform", body=["foo"], processor=processor
+        )
