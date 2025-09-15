@@ -28,13 +28,21 @@ class BaseProcessor(abc.ABC):
     checker: Callable[[Any], bool]
 
     def __init__(
-        self, arch: str, target_arch: str, platforms: Collection[str] | None = None
+        self,
+        arch: str,
+        target_arch: str,
+        platforms: Collection[str] | None = None,
+        *,
+        valid_platforms: Collection[str] | None = None,
+        valid_architectures: Collection[str] | None = None,
     ) -> None:
         self.arch = arch
         self.target_arch = target_arch
         if platforms and "any" in platforms:
             raise PlatformNameError("any")
         self.platforms = None if platforms is None else {"any"} | set(platforms)
+        self.valid_platforms = valid_platforms
+        self.valid_architectures = valid_architectures
 
     @abc.abstractmethod
     def process(

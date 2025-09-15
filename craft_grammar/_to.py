@@ -23,7 +23,7 @@ from overrides import overrides
 
 from ._base_processor import BaseProcessor
 from ._statement import CallStack, Grammar, Statement
-from .errors import ToStatementSyntaxError
+from .errors import ToStatementSyntaxError, UnknownArchitectureError
 
 _SELECTOR_PATTERN = re.compile(r"\Ato\s+([^,\s](?:,?[^,]+)*)\Z")
 _WHITESPACE_PATTERN = re.compile(r"\A.*\s.*\Z")
@@ -52,6 +52,10 @@ class ToStatement(Statement):
         super().__init__(body=body, processor=processor, call_stack=call_stack)
 
         self.selectors = _extract_to_clause_selectors(to_statement)
+        if processor.valid_architectures is not None:
+            for selector in self.selectors:
+                if selector not in processor.valid_architectures:
+                    raise UnknownArchitectureError(selector)
 
     @overrides
     def check(self) -> bool:

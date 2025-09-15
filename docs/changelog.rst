@@ -16,6 +16,17 @@ Changelog
 
   For a complete list of commits, check out the `X.Y.Z`_ release on GitHub.
 
+.. _release 2.3.0:
+
+2.3.0 (unreleased)
+------------------
+
+New features:
+
+- The ``checker`` option for ``GrammarProcessor`` is now optional.
+
+For a complete list of commits, check out the `2.3.0`_ release on GitHub.
+
 .. _release 2.2.0:
 
 2.2.0 (2025-08-26)
@@ -94,3 +105,4 @@ Features:
 
 .. _2.1.0: https://github.com/canonical/craft-grammar/releases/tag/2.1.0
 .. _2.2.0: https://github.com/canonical/craft-grammar/releases/tag/2.2.0
+.. _2.3.0: https://github.com/canonical/craft-grammar/releases/tag/2.3.0
