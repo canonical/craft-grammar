@@ -61,7 +61,7 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
     def __init__(
         self,
         *,
-        checker: Callable[[Any], bool],
+        checker: Callable[[Any], bool] = lambda _: True,
         arch: str,
         target_arch: str,
         platforms: Collection[str] | None = None,
