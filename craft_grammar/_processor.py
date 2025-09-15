@@ -189,9 +189,9 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
 
         if self._variant != variant:
             raise GrammarSyntaxError(
-                "The 'for' statement can't be used with other grammar statements. "
-                "Either replace all 'for <platform>' statements with 'to <arch>' or "
-                "remove all other grammar statements"
+                "The 'for' statement can't be used with 'on' or 'to' statements. "
+                "Either replace all 'to <arch>' statements with 'for <platform>' or "
+                "replace all 'for <platform>' statements with 'to <arch>' statements."
             )
 
     @property
@@ -324,8 +324,6 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
                 )
 
             elif _ELSE_CLAUSE_PATTERN.match(key):
-                self._set_variant(Variant.TO_VARIANT)
-
                 _handle_else(statement, value)
             else:
                 # Since this section is a dictionary, if there are no

@@ -1,9 +1,0 @@
-# invalid data - 'for' and 'else' are both present
-
-# no grammar
-plugin: nil
-
-source-branch:
-  - for platform1: branch1
-  - else: branch2
-  - branch3
