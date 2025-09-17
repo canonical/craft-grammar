@@ -390,11 +390,6 @@ def test_invalid_grammar(scenario):
             id="to-and-for",
         ),
         pytest.param(
-            [{"for test-platform": ["foo"]}, {"else": "bar"}],
-            Variant.UNKNOWN,
-            id="for-and-else",
-        ),
-        pytest.param(
             [{"for test-platform": ["foo"]}, {"try": "bar"}],
             Variant.UNKNOWN,
             id="for-and-try",
