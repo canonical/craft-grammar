@@ -145,9 +145,11 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
                         primitives=primitives,
                     )
                     statement = None
-
-                    primitive = self._transformer(call_stack, section, self.target_arch)
-                    primitives.append(primitive)
+                    if self.target_arch is not None:
+                        primitive = self._transformer(
+                            call_stack, section, self.target_arch
+                        )
+                        primitives.append(primitive)
             elif isinstance(section, dict):
                 statement, finalized_statement = self._parse_section_dictionary(
                     call_stack=call_stack,
