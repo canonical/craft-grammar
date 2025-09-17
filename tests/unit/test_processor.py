@@ -18,7 +18,7 @@
 import re
 
 import pytest
-from craft_grammar import GrammarProcessor, ToStatement, errors
+from craft_grammar import GrammarProcessor, ToStatement, Variant, errors
 
 
 @pytest.mark.parametrize(
@@ -367,38 +367,46 @@ def test_invalid_grammar(scenario):
 
 
 @pytest.mark.parametrize(
-    "grammar_entry",
+    ("grammar_entry", "variant"),
     [
         pytest.param(
             [{"for test-platform": ["foo"]}, {"on riscv64": "bar"}],
+            Variant.UNKNOWN,
             id="for-and-on",
         ),
         pytest.param(
             [{"on riscv64": "bar"}, {"for test-platform": ["foo"]}],
+            Variant.UNKNOWN,
             id="on-and-for",
         ),
         pytest.param(
             [{"for test-platform": ["foo"]}, {"to riscv64": "bar"}],
+            Variant.UNKNOWN,
             id="for-and-to",
         ),
         pytest.param(
             [{"to riscv64": "bar"}, {"for test-platform": ["foo"]}],
+            Variant.UNKNOWN,
             id="to-and-for",
         ),
         pytest.param(
             [{"for test-platform": ["foo"]}, {"try": "bar"}],
+            Variant.UNKNOWN,
             id="for-and-try",
         ),
         pytest.param(
             [{"try": "bar"}, {"for test-platform": ["foo"]}],
+            Variant.UNKNOWN,
             id="try-and-for",
         ),
         pytest.param(
             [{"for test-platform": ["foo"]}, {"on riscv64 to amd64": "bar"}],
+            Variant.UNKNOWN,
             id="for-and-on-to",
         ),
         pytest.param(
             [{"on riscv64 to amd64": "bar"}, {"for test-platform": ["foo"]}],
+            Variant.UNKNOWN,
             id="on-to-and-for",
         ),
         pytest.param(
@@ -408,6 +416,7 @@ def test_invalid_grammar(scenario):
                 {"baz"},
                 {"to riscv64": "qux"},
             ],
+            Variant.UNKNOWN,
             id="many-and-for",
         ),
         pytest.param(
@@ -417,25 +426,49 @@ def test_invalid_grammar(scenario):
                 {"baz"},
                 {"to riscv64": "qux"},
             ],
+            Variant.UNKNOWN,
             id="for-and-many",
         ),
         pytest.param(
             [{"for test-platform": {"on amd64 to amd64": "bar"}}],
+            Variant.UNKNOWN,
             id="nested-for-on-to",
         ),
         pytest.param(
             [{"on amd64 to amd64": [{"for test-platform": "bar"}]}],
+            Variant.UNKNOWN,
             id="nested-on-to-for",
+        ),
+        pytest.param(
+            [{"for test-platform": "foo"}],
+            Variant.TO_VARIANT,
+            id="for-with-app-defined-to-variant",
+        ),
+        pytest.param(
+            [{"to amd64": "foo"}],
+            Variant.FOR_VARIANT,
+            id="to-with-app-defined-for-variant",
+        ),
+        pytest.param(
+            [{"on amd64 to amd64": "foo"}],
+            Variant.FOR_VARIANT,
+            id="on-to-with-app-defined-for-variant",
+        ),
+        pytest.param(  # This is currently true but will become false with CRAFT-4744
+            [{"on amd64": "foo"}],
+            Variant.FOR_VARIANT,
+            id="on-with-app-defined-for-variant",
         ),
     ],
 )
-def test_variant_error(grammar_entry):
+def test_variant_error(grammar_entry, variant):
     """Error when multiple variants are used."""
     processor = GrammarProcessor(
         arch="amd64",
         target_arch="amd64",
         platforms=["test-platform"],
         checker=lambda x: True,
+        variant=variant,
     )
     expected_error = re.escape(
         "The 'for' statement can't be used with 'on' or 'to' statements. "

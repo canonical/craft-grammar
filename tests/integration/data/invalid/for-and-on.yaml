@@ -1,4 +1,4 @@
-# invalid data - 'for' and 'to' are both present
+# invalid data - 'for' and 'on' are both present
 
 # no grammar
 plugin: nil
@@ -8,6 +8,6 @@ source-branch:
   - branch2
 
 build-packages:
-  - to riscv64:
+  - on riscv64:
       - package1
   - package2
