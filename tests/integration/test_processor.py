@@ -88,11 +88,12 @@ def process_data(
 
 
 @pytest.mark.parametrize("platform", ["platform1", "platform2", "platform3"])
-def test_for(platform):
+@pytest.mark.parametrize("test_set", ["for", "for-else"])
+def test_for(platform: str, test_set: str):
     """Process the `for` statement."""
-    data = yaml.safe_load((VALID_DATA_FILES_PATH / "for.yaml").read_text())
+    data = yaml.safe_load((VALID_DATA_FILES_PATH / f"{test_set}.yaml").read_text())
     expected_data = yaml.safe_load(
-        (VALID_DATA_FILES_PATH / f"for.for-{platform}.yaml").read_text()
+        (VALID_DATA_FILES_PATH / f"{test_set}.for-{platform}.yaml").read_text()
     )
     processor = GrammarProcessor(
         checker=self_check, arch="amd64", target_arch="riscv64", platforms=[platform]
@@ -131,14 +132,13 @@ def test_on_to(arch, target_arch):
     [
         "for-and-to",
         "for-and-on",
-        "for-and-else",
     ],
 )
 def test_variant_error(filename):
     """Error when two variants of grammar are used."""
     data = yaml.safe_load((INVALID_DATA_FILES_PATH / f"{filename}.yaml").read_text())
     expected_error = re.escape(
-        "Invalid grammar syntax: The 'for' statement can't be used with other grammar statements."
+        "Invalid grammar syntax: The 'for' statement can't be used with 'on' or 'to'"
     )
     processor = GrammarProcessor(
         checker=self_check, arch="amd64", target_arch="riscv64", platforms=["platform1"]

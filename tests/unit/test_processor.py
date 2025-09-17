@@ -476,9 +476,9 @@ def test_variant_error(grammar_entry, variant):
         variant=variant,
     )
     expected_error = re.escape(
-        "Invalid grammar syntax: The 'for' statement can't be used with other "
-        "grammar statements. Either replace all 'for <platform>' statements with "
-        "'to <arch>' or remove all other grammar statements."
+        "The 'for' statement can't be used with 'on' or 'to' statements. "
+        "Either replace all 'to <arch>' statements with 'for <platform>' or "
+        "replace all 'for <platform>' statements with 'to <arch>' statements."
     )
 
     with pytest.raises(errors.GrammarSyntaxError, match=expected_error):

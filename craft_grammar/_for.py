@@ -25,7 +25,6 @@ from ._base_processor import BaseProcessor
 from ._statement import CallStack, Grammar, Statement
 from .errors import (
     ForStatementSyntaxError,
-    GrammarSyntaxError,
     UnknownPlatformNameError,
 )
 
@@ -73,19 +72,6 @@ class ForStatement(Statement):
             and (len(self.selectors) == 1)
             and (self.selectors.issubset(self._processor.platforms))
         )
-
-    @overrides
-    def add_else(
-        self,
-        else_body: Grammar | None,  # noqa: ARG002 (unused-argument)
-    ) -> None:
-        """Raise an error for 'else' usage.
-
-        The 'for' statement doesn't support 'else'.
-
-        :raises GrammarSyntaxError: When called.
-        """
-        raise GrammarSyntaxError("'else' is not supported for 'for'")
 
     def __eq__(self, other: object) -> bool:
         if type(other) is type(self):
