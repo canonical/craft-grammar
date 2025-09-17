@@ -24,7 +24,7 @@ Changelog
 New features:
 
 - The ``checker`` option for ``GrammarProcessor`` is now optional.
-- Add ``any`` as an always-available as a platform for ``for`` grammar that is always
+- Add ``any`` as an always-available platform for ``for`` grammar that is always
   true.
 - Add ``valid_platforms`` and ``valid_architectures`` optional arguments to
   ``GrammarProcessor`` to allow validation of platforms and architectures listed in
