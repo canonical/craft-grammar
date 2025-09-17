@@ -386,10 +386,6 @@ def test_invalid_grammar(scenario):
             id="to-and-for",
         ),
         pytest.param(
-            [{"for test-platform": ["foo"]}, {"else": "bar"}],
-            id="for-and-else",
-        ),
-        pytest.param(
             [{"for test-platform": ["foo"]}, {"try": "bar"}],
             id="for-and-try",
         ),
@@ -442,9 +438,9 @@ def test_variant_error(grammar_entry):
         checker=lambda x: True,
     )
     expected_error = re.escape(
-        "Invalid grammar syntax: The 'for' statement can't be used with other "
-        "grammar statements. Either replace all 'for <platform>' statements with "
-        "'to <arch>' or remove all other grammar statements."
+        "The 'for' statement can't be used with 'on' or 'to' statements. "
+        "Either replace all 'to <arch>' statements with 'for <platform>' or "
+        "replace all 'for <platform>' statements with 'to <arch>' statements."
     )
 
     with pytest.raises(errors.GrammarSyntaxError, match=expected_error):

@@ -90,26 +90,6 @@ def test_for_no_platforms_to_match():
     assert clause.process() == []
 
 
-def test_for_else_error():
-    """Error when registering 'else'."""
-    processor = GrammarProcessor(
-        checker=lambda x: True,
-        arch="amd64",
-        target_arch="amd64",
-        platforms=["test-platform"],
-    )
-    expected_error = re.escape("'else' is not supported for 'for'")
-
-    clause = ForStatement(
-        for_statement="for test-platform",
-        body=["foo"],
-        processor=processor,
-    )
-
-    with pytest.raises(errors.GrammarSyntaxError, match=expected_error):
-        clause.add_else(["bar"])
-
-
 @pytest.mark.parametrize(
     ("statement", "expected_error"),
     [
