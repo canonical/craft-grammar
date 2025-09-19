@@ -18,12 +18,19 @@ Changelog
 
 .. _release 2.3.0:
 
-2.3.0 (unreleased)
+2.3.0 (2025-09-19)
 ------------------
 
 New features:
 
 - The ``checker`` option for ``GrammarProcessor`` is now optional.
+- Add the ``any`` platform.  ``for`` statements that select against this platform
+  are always true.
+- Add the optional ``valid_platforms`` and ``valid_architectures`` arguments to
+  ``GrammarProcessor``, which allow for the validation of platforms and architectures
+  listed in the grammar.
+- Add an ``else`` clause to the ``for`` statement.
+- Apps that use ``GrammarProcessor`` can now choose a specific grammar variant.
 
 For a complete list of commits, check out the `2.3.0`_ release on GitHub.
 
