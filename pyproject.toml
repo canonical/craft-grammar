@@ -20,7 +20,7 @@ lint = [
     # Left empty for scaffolding and Makefile compatibility
 ]
 types = [
-    "mypy[reports]~=1.18.1",
+    "mypy[reports]~=1.19.0",
     "types-Pygments",
     "types-colorama",
     "types-setuptools",
@@ -40,7 +40,7 @@ dev = [
     "pytest~=9.0",
     "pytest-cov~=7.0",
     "pytest-mock~=3.12",
-    "mypy[reports]~=1.18.1",
+    "mypy[reports]~=1.19.0",
     "PyYAML",
     "types-requests",
     "types-Pygments",
