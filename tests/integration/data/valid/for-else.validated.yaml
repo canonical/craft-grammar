@@ -1,0 +1,26 @@
+# no grammar
+plugin: nil
+
+# string
+source-branch:
+  - "*for platform1": branch1
+  - "*for platform2": branch2
+
+# list
+build-packages:
+  - "*for platform1":
+      - package1
+  - "*for platform2":
+      - package2
+  - package3
+
+# dict
+organize:
+  - "*for platform1":
+      file1: file2
+      file3: file4
+  - "*for platform2":
+      file4: file5
+      file6: file7
+  - "*for any":
+      always-organize: to-here

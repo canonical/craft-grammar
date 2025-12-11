@@ -61,13 +61,14 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
     def __init__(
         self,
         *,
-        checker: Callable[[Any], bool],
+        checker: Callable[[Any], bool] = lambda _: True,
         arch: str,
-        target_arch: str,
+        target_arch: str | None = None,
         platforms: Collection[str] | None = None,
         transformer: Callable[[list[Statement], str, str], str] | None = None,
         valid_platforms: Collection[str] | None = None,
         valid_architectures: Collection[str] | None = None,
+        variant: Variant = Variant.UNKNOWN,
     ) -> None:
         """Create a new GrammarProcessor.
 
@@ -80,6 +81,11 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
                           selectors for the 'for' statement. Duplicates are ignored.
         :param transformer: Callable accepting a call stack, single primitive and arch, and
                             returning a transformed primitive.
+        :param valid_platforms: If given, a collection of platform names that are valid
+            as the object of "for" statements.
+        :param valid_arch: If given, a collection of architecture names that are valid
+            as the object of "on" or "to" statements.
+        :param variant: The grammar variant to use. Defaults to auto-detecting.
         """
         super().__init__(
             arch,
@@ -89,8 +95,13 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
             valid_architectures=valid_architectures,
         )
         self.checker = checker
-        # The variant is unknown until the grammar is processed.
-        self._variant = Variant.UNKNOWN
+        if variant == Variant.UNKNOWN and None in (target_arch, platforms):
+            if target_arch is None:
+                self._variant = Variant.FOR_VARIANT
+            elif platforms is None:
+                self._variant = Variant.TO_VARIANT
+        else:
+            self._variant = variant
 
         if transformer:
             self._transformer = transformer
@@ -134,9 +145,11 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
                         primitives=primitives,
                     )
                     statement = None
-
-                    primitive = self._transformer(call_stack, section, self.target_arch)
-                    primitives.append(primitive)
+                    if self.target_arch is not None:
+                        primitive = self._transformer(
+                            call_stack, section, self.target_arch
+                        )
+                        primitives.append(primitive)
             elif isinstance(section, dict):
                 statement, finalized_statement = self._parse_section_dictionary(
                     call_stack=call_stack,
@@ -189,9 +202,9 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
 
         if self._variant != variant:
             raise GrammarSyntaxError(
-                "The 'for' statement can't be used with other grammar statements. "
-                "Either replace all 'for <platform>' statements with 'to <arch>' or "
-                "remove all other grammar statements"
+                "The 'for' statement can't be used with 'on' or 'to' statements. "
+                "Either replace all 'to <arch>' statements with 'for <platform>' or "
+                "replace all 'for <platform>' statements with 'to <arch>' statements."
             )
 
     @property
@@ -324,8 +337,6 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
                 )
 
             elif _ELSE_CLAUSE_PATTERN.match(key):
-                self._set_variant(Variant.TO_VARIANT)
-
                 _handle_else(statement, value)
             else:
                 # Since this section is a dictionary, if there are no

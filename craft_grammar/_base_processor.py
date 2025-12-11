@@ -30,7 +30,7 @@ class BaseProcessor(abc.ABC):
     def __init__(
         self,
         arch: str,
-        target_arch: str,
+        target_arch: str | None = None,
         platforms: Collection[str] | None = None,
         *,
         valid_platforms: Collection[str] | None = None,
