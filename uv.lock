@@ -188,7 +188,7 @@ filecache = [
 
 [[package]]
 name = "canonical-sphinx"
-version = "0.5.2"
+version = "0.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "furo" },
@@ -198,9 +198,9 @@ dependencies = [
     { name = "sphinx", version = "8.1.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "sphinx", version = "8.2.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d2/fc/3274925945e8097307f8bed3445698e5775260b3c3a211f0094d91dfa8ad/canonical_sphinx-0.5.2.tar.gz", hash = "sha256:6957f9c63cf73c91e65e20803c008c51c0742cdf405a9f99d456e7121756181f", size = 1053472, upload-time = "2026-01-09T00:39:52.123Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2d/8c/c8b9cae5b0a4f2214e096c73f1ef20e62c2b37a23d55bbec04bc096d2f17/canonical_sphinx-0.6.0.tar.gz", hash = "sha256:a5a72a087727aced5ef5b6e5ab7225a00cdcbc87e91f5d1cdc069e376007c273", size = 1049303, upload-time = "2026-02-26T07:28:52.563Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2a/6d/a33fe3c680d18bbd38b13873c8e697b6fc741d81971c1e456a2773fbf58a/canonical_sphinx-0.5.2-py3-none-any.whl", hash = "sha256:9cc4fa411741e08205f2cc0f3332ffc7a595f0e898b3b085a7b8188771085885", size = 1030655, upload-time = "2026-01-09T00:39:49.776Z" },
+    { url = "https://files.pythonhosted.org/packages/b3/3b/deba42ad80932723daba144d70f0cabec215eeab62e59d9911b0b9792988/canonical_sphinx-0.6.0-py3-none-any.whl", hash = "sha256:3a74f3cbaf68493904f33b63b8802128e0813404c64913292b501e7a21e9d222", size = 1026784, upload-time = "2026-02-26T07:28:50.817Z" },
 ]
 
 [[package]]
@@ -491,7 +491,7 @@ dev = [
     { name = "types-setuptools" },
 ]
 docs = [
-    { name = "canonical-sphinx", specifier = "~=0.5.0" },
+    { name = "canonical-sphinx", specifier = "~=0.6.0" },
     { name = "sphinx-autobuild", specifier = "~=2024.2" },
     { name = "sphinx-autodoc-typehints", specifier = "~=2.1" },
     { name = "sphinx-lint", specifier = "~=1.0" },
@@ -572,7 +572,7 @@ name = "exceptiongroup"
 version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/50/79/66800aadf48771f6b62f7eb014e352e5d06856655206165d775e675a02c9/exceptiongroup-1.3.1.tar.gz", hash = "sha256:8b412432c6055b0b7d14c310000ae93352ed6754f70fa8f7c34141f91c4e3219", size = 30371, upload-time = "2025-11-21T23:01:54.787Z" }
 wheels = [
@@ -664,7 +664,7 @@ name = "importlib-metadata"
 version = "8.7.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "zipp" },
+    { name = "zipp", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/f3/49/3b30cad09e7771a4982d9975a8cbf64f00d4a1ececb53297f1d9a7be1b10/importlib_metadata-8.7.1.tar.gz", hash = "sha256:49fef1ae6440c182052f407c8d34a68f72efc36db9ca90dc0113398f2fdde8bb", size = 57107, upload-time = "2025-12-21T10:00:19.278Z" }
 wheels = [
