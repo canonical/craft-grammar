@@ -16,8 +16,6 @@
 
 """Compound Statement for Craft Grammar."""
 
-from typing import cast
-
 from overrides import overrides
 
 from ._base_processor import BaseProcessor
@@ -52,7 +50,7 @@ class CompoundStatement(Statement):
 
     def __eq__(self, other: object) -> bool:
         if type(other) is type(self):
-            return self.statements == cast(CompoundStatement, other).statements
+            return self.statements == other.statements
 
         return False
 

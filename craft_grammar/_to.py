@@ -17,7 +17,6 @@
 """To Statement for Craft Grammar."""
 
 import re
-from typing import cast
 
 from overrides import overrides
 
@@ -68,7 +67,7 @@ class ToStatement(Statement):
 
     def __eq__(self, other: object) -> bool:
         if type(other) is type(self):
-            return self.selectors == cast(ToStatement, other).selectors
+            return self.selectors == other.selectors
 
         return False
 
