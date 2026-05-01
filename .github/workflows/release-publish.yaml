@@ -3,7 +3,7 @@ on:
   push:
     tags:
       # These tags should be protected, remember to enable the rule:
-      # https://github.com/canonical/starbase/settings/tag_protection
+      # https://github.com/canonical/craft-grammar/settings/tag_protection
       - "[0-9]+.[0-9]+.[0-9]+"
 
 permissions:
@@ -16,7 +16,7 @@ jobs:
       - name: Install uv
         run: |
           sudo snap install --classic astral-uv
-          sudo apt-get --yes install python3-venv
+          sudo apt --yes install python3-venv
       - name: Checkout
         uses: actions/checkout@v6
       - name: Fetch tag annotations

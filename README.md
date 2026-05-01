@@ -1,60 +1,40 @@
 # Craft Grammar
 
+[![PyPI][pypi-badge]][pypi-site]
+[![Documentation][rtd-badge]][rtd-site]
+[![Ruff status][ruff-badge]][ruff-site]
+
 This project aims to provide python interfaces for using advanced
 grammar in [Craft Parts](https://craft-grammar.readthedocs.io)
 
-# License
+## Documentation:
 
-Free software: GNU Lesser General Public License v3
+The [Craft Grammar documentation][rtd-site] provides guidance about understanding and using the library.
 
-# Documentation:
+## Community and support
 
-https://craft-grammar.readthedocs.io.
+You can report any issues or bugs on the project's [GitHub repository](https://github.com/canonical/craft-grammar/issues).
 
-# Contributing
+Craft Grammar is covered by the [Ubuntu Code of Conduct](https://ubuntu.com/community/docs/ethos/code-of-conduct).
 
-A `Makefile` is provided for easy interaction with the project. To see
-all available options run:
+## Contribute to Craft Grammar
 
-    make help
+Craft Grammar is open source and part of the Canonical family. We would love your help.
 
-## Running tests
+If you're interested, start with the [contribution guide](CONTRIBUTING.md).
 
-To run all tests in the suite run:
+We welcome any suggestions and help with the docs. The [Canonical Open Documentation Academy](https://github.com/canonical/open-documentation-academy)
+is the hub for doc development, including Craft Grammar docs. No prior coding experience is required.
 
-    make tests
+## License and copyright
 
-## Adding new requirements
+Craft Grammar is released uner the [LGPL-3.0 license](LICENSE).
 
-If a new dependency is added to the project run:
+© 2022-2026 Canonical Ltd.
 
-    make freeze-requirements
-
-## Verifying documentation changes
-
-To locally verify documentation changes run:
-
-    make docs
-
-After running, newly generated documentation shall be available at
-`./docs/_build/html/`.
-
-## Committing code
-
-Please follow these guidelines when committing code for this project:
-
-- Use a topic with a colon to start the subject
-- Separate subject from body with a blank line
-- Limit the subject line to 50 characters
-- Do not capitalize the subject line
-- Do not end the subject line with a period
-- Use the imperative mood in the subject line
-- Wrap the body at 72 characters
-- Use the body to explain what and why (instead of how)
-
-As an example:
-
-    endpoints: support package attenuations
-
-    Required in order to obtain credentials that apply only to a given package;
-    be it charm, snap or bundle.
+[pypi-badge]: https://img.shields.io/pypi/v/craft-grammar
+[pypi-site]: https://pypi.org/project/craft-grammar
+[rtd-badge]: https://readthedocs.com/projects/canonical-craft-grammar/badge/?version=latest
+[rtd-site]: https://canonical-craft-grammar.readthedocs-hosted.com/
+[ruff-badge]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json
+[ruff-site]: https://github.com/astral-sh/ruff

@@ -1,7 +1,7 @@
 [project]
 name = "craft-grammar"
 description = "Provide python interfaces for using advanced grammar in craft-parts"
-dynamic = ["version", "readme"]
+dynamic = ["version"]
 dependencies = [
     "overrides",
     "pydantic~=2.0",
@@ -14,6 +14,7 @@ classifiers = [
 ]
 license = "GPL-3.0"
 requires-python = ">=3.10"
+readme = { file = "README.md", content-type = "text/markdown" }
 
 [dependency-groups]
 lint = [
@@ -81,8 +82,6 @@ constraint-dependencies = [
 requires = ["setuptools>=69.0", "setuptools_scm[toml]>=7.1"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.dynamic]
-readme = { file = "README.md" }
 
 [tool.setuptools_scm]
 write_to = "craft_grammar/_version.py"
@@ -248,9 +247,9 @@ select = [ # Base linting rule selections.
     "SLF",    # Prevent accessing private class members.
     "SIM",    # Code simplification
     "TID",    # Tidy imports
-    # The team have chosen to only use type-checking blocks when necessary to prevent circular imports.
-    # As such, the only enabled type-checking checks are those that warn of an import that needs to be
-    # removed from a type-checking block.
+    "TC001",  # Checks for first-party imports that are only used for type annotations
+    "TC002",  # Checks for third-party imports that are only used for type annotations
+    "TC003",  # Checks for standard library imports that are only used for type annotations
     "TC004",  # Remove imports from type-checking guard blocks if used at runtime
     "TC005",  # Delete empty type-checking blocks
     "ARG",    # Unused arguments
@@ -328,6 +327,8 @@ classmethod-decorators = ["pydantic.validator", "pydantic.root_validator"]
     "PLR0913", # Allow many arguments for test functions (useful if we need many fixtures)
     "PLR2004", # Allow magic values in tests
     "SLF",     # Allow accessing private members from tests.
+    "FBT001",  # Boolean-typed positional arguments are common in tests (e.g. parametrize)
+    "FBT002",  # Boolean default values are common in test helper functions
 ]
 "__init__.py" = [
     "I001", # isort leaves init files alone by default, this makes ruff ignore them too.
