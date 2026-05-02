@@ -1,7 +1,7 @@
 .. craft grammar documentation root file
 
 Craft Grammar
-=========
+=============
 
 .. list-table::
 
