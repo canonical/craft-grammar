@@ -514,10 +514,12 @@ def test_grammar_nested_error():
         x: Grammar[str]
 
     with pytest.raises(pydantic.ValidationError) as raised:
-        GrammarValidation(
-            x=[  # pyright: ignore [reportArgumentType]
-                {"on arm64,amd64": [{"on arm64": "foo"}, {"else": [35]}]},
-            ],
+        GrammarValidation.model_validate(
+            {
+                "x": [
+                    {"on arm64,amd64": [{"on arm64": "foo"}, {"else": [35]}]},
+                ],
+            }
         )
     err = raised.value.errors()
     assert len(err) == 1
@@ -532,8 +534,10 @@ def test_grammar_str_elsefail():
 
         x: Grammar[str]
 
-    GrammarValidation(
-        x=[{"on arch": "foo"}, "else fail"],  # pyright: ignore [reportArgumentType]
+    GrammarValidation.model_validate(
+        {
+            "x": [{"on arch": "foo"}, "else fail"],
+        }
     )
 
 
@@ -543,8 +547,10 @@ def test_grammar_strlist_elsefail():
 
         x: Grammar[list[str]]
 
-    GrammarValidation(
-        x=[{"on arch": ["foo"]}, "else fail"],  # pyright: ignore [reportArgumentType]
+    GrammarValidation.model_validate(
+        {
+            "x": [{"on arch": ["foo"]}, "else fail"],
+        }
     )
 
 
@@ -555,7 +561,7 @@ def test_grammar_try():
         x: Grammar[str]
 
     with pytest.raises(pydantic.ValidationError) as raised:
-        GrammarValidation(x=[{"try": "foo"}])  # pyright: ignore [reportArgumentType]
+        GrammarValidation.model_validate({"x": [{"try": "foo"}]})
 
     err = raised.value.errors()
     assert len(err) == 1
@@ -602,14 +608,14 @@ def test_grammar_try():
         ("for platform1 platform2", "spaces are not allowed in 'for' selector"),
     ],
 )
-def test_grammar_errors(clause, err_msg):
+def test_grammar_errors(clause: str, err_msg: str):
     class GrammarValidation(pydantic.BaseModel):
         """Test validation of grammar-enabled types."""
 
         x: Grammar[str]
 
     with pytest.raises(pydantic.ValidationError) as raised:
-        GrammarValidation(x=[{clause: "foo"}])  # pyright: ignore [reportArgumentType]
+        GrammarValidation.model_validate({"x": [{clause: "foo"}]})
 
     err = raised.value.errors()
     assert len(err) == 1

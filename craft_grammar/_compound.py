@@ -16,6 +16,8 @@
 
 """Compound Statement for Craft Grammar."""
 
+from collections.abc import Sequence
+
 from overrides import overrides
 
 from ._base_processor import BaseProcessor
@@ -28,7 +30,7 @@ class CompoundStatement(Statement):
     def __init__(
         self,
         *,
-        statements: list[Statement],
+        statements: Sequence[Statement],
         body: Grammar,
         processor: BaseProcessor,
         call_stack: CallStack | None = None,
