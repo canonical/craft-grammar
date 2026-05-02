@@ -17,7 +17,7 @@ import os
 #######################
 
 # Project name
-project = "Starbase"
+project = "Craft Grammar"
 author = "Canonical Ltd."
 
 # Format the product name + version for the TOC and HTML title
