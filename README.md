@@ -7,9 +7,9 @@
 This project aims to provide python interfaces for using advanced
 grammar in [Craft Parts](https://craft-grammar.readthedocs.io)
 
-## Documentation:
+## Documentation
 
-The [Craft Grammar documentation][rtd-site] provides guidance about understanding and using the library.
+The [Craft Grammar documentation][https://canonical-craft-grammar.readthedocs-hosted.com] provides guidance about understanding and using the library.
 
 ## Community and support
 
@@ -28,7 +28,7 @@ is the hub for doc development, including Craft Grammar docs. No prior coding ex
 
 ## License and copyright
 
-Craft Grammar is released uner the [LGPL-3.0 license](LICENSE).
+Craft Grammar is released under the [LGPL-3.0 license](LICENSE).
 
 © 2022-2026 Canonical Ltd.
 
