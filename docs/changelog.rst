@@ -81,7 +81,7 @@ Breaking changes:
 - Make minimum Python version 3.10
 
 Features:
-- Add create_grammar_model() function to make a pydantic model grammar-aware
+- Add create_grammar_model() function to make a Pydantic model grammar-aware
 
 1.2.0 (2024-04-05)
 ------------------
