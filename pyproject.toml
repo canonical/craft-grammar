@@ -130,9 +130,11 @@ git_describe_command = [
     "*[^0-9.]*",
 ]
 
-[tool.setuptools.packages.find]
-include = ["*craft*"]
-namespaces = false
+# NOTE: Do not merge starbase's auto-find here, as we are intentionally adding two
+# packages using this manual description.
+[tool.setuptools.package-dir]
+"craft_grammar" = "craft_grammar"
+"craft_grammar_docs" = "docs/common"
 
 [tool.codespell]
 ignore-words-list = "Afor,buildd,crate,keyserver,comandos,ro,dedent,dedented"
