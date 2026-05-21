@@ -177,6 +177,7 @@ extensions = [
 # Excludes files or directories from processing
 exclude_patterns = [
     "README.md",  # Docs README
+    "common/README.md",  # Shared README
     "reuse",
 ]
 
