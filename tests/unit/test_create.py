@@ -91,10 +91,6 @@ if sys.version_info >= (3, 14):
             "union_value: Grammar[Union[str, int, None]]",
             "union_value: Grammar[str] | Grammar[int] | None",
         )
-        .replace(
-            "str_or_non_with_default: Grammar[str] | None",
-            "str_or_non_with_default: Grammar[str] | None",  # No change needed here
-        )
     )
 
 
