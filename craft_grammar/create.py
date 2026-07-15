@@ -109,6 +109,13 @@ def _get_grammar_type_for(  # noqa: PLR0911,PLR0912 (too many returns/branches)
                 return f"Grammar{model_type.__name__}"
             return f"Grammar[{model_type.__name__}]"
 
+        case types.UnionType:
+            # Type is an expression like "str | int | None"
+            # A type like "str | None" becomes "Grammar[str] | None"
+            grammar_types = [_get_grammar_type_for(a) for a in args]
+            grammar_args = [t for t in grammar_types if t is not None]
+            return " | ".join(grammar_args)
+
         case typing.Union:
             # Type is either a Union[] or an Optional[]
             if len(args) == 2 and type(None) in args:  # noqa: PLR2004 (magic value)
@@ -129,13 +136,6 @@ def _get_grammar_type_for(  # noqa: PLR0911,PLR0912 (too many returns/branches)
                     union_args.append(str(arg))
             comma_args = ", ".join(union_args)
             return f"Grammar[Union[{comma_args}]]"
-
-        case types.UnionType:
-            # Type is an expression like "str | int | None"
-            # A type like "str | None" becomes "Grammar[str] | None"
-            grammar_types = [_get_grammar_type_for(a) for a in args]
-            grammar_args = [t for t in grammar_types if t is not None]
-            return " | ".join(grammar_args)
 
         case builtins.list | builtins.dict:
             # list[T] -> Grammar[list[T]]
