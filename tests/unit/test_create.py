@@ -15,6 +15,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import annotations
 
+import sys
 from typing import List, Literal, Optional, Union  # noqa: UP035 (deprecated-import)
 
 from craft_grammar import create_grammar_model
@@ -79,6 +80,18 @@ class GrammarMyModel(BaseModel):
     alias_name: Grammar[int] = 1
     factory_field: Grammar[str] = ""
 """
+
+if sys.version_info >= (3, 14):
+    EXPECTED_GRAMMAR_MODEL = (
+        EXPECTED_GRAMMAR_MODEL.replace(
+            "optional_str_value: Optional[Grammar[str]]",
+            "optional_str_value: Grammar[str] | None",
+        )
+        .replace(
+            "union_value: Grammar[Union[str, int, None]]",
+            "union_value: Grammar[str] | Grammar[int] | None",
+        )
+    )
 
 
 def test_create_model():
