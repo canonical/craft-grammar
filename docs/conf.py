@@ -32,10 +32,6 @@ release = "dev" if os.environ.get("READTHEDOCS_VERSION") == "latest" else f"{maj
 # The year in the copyright statement
 copyright = f"2022-{datetime.date.today().year}"
 
-# Sidebar documentation title
-# To disable the title, set it to an empty string.
-html_title = project + " documentation"
-
 # Documentation website URL
 ogp_site_url = "https://documentation.ubuntu.com/craft-grammar/"
 
