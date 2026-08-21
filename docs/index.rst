@@ -1,4 +1,6 @@
-.. craft grammar documentation root file
+.. meta::
+    :description: Craft Grammar is a Python library that supports advanced grammar declarations in project files for craft apps.
+
 
 Craft Grammar
 =============
