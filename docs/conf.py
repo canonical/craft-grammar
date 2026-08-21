@@ -1,5 +1,8 @@
 import datetime
 import os
+import textwrap
+
+import craft_grammar
 
 # Configuration for the Sphinx documentation builder.
 # All configuration specific to your project should be done in this file.
@@ -7,8 +10,8 @@ import os
 # A complete list of built-in Sphinx configuration values:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 #
-# Our starter pack uses the custom Canonical Sphinx extension
-# to keep all documentation based on it consistent and on brand:
+# The Sphinx Stack uses the Canonical Sphinx theme to keep all documentation consistent
+# and on brand:
 # https://github.com/canonical/canonical-sphinx
 
 
@@ -18,29 +21,28 @@ import os
 
 # Project name
 project = "Craft Grammar"
+
+# Author name; used in the default copyright statement in the page footer
 author = "Canonical Ltd."
 
-# Format the product name + version for the TOC and HTML title
-# When the product begins versioning, uncomment this block
-# release = <starcraft>.__version__
-# if ".post" in release:
-#     release = "dev"
-# else:
-#     major, minor, *_ = release.split(".")
-#     release = f"{major}.{minor}"
+# Version string in sidebar
+major, minor, *_ = craft_grammar.__version__.split(".")
+release = "dev" if os.environ.get("READTHEDOCS_VERSION") == "latest" else f"{major}.{minor}"
 
-# Copyright string; shown at the bottom of the page
-copyright = f"2022-{datetime.date.today().year}, {author}"
+# The year in the copyright statement
+copyright = f"2022-{datetime.date.today().year}"
+
+# Sidebar documentation title
+# To disable the title, set it to an empty string.
+html_title = project + " documentation"
 
 # Documentation website URL
-ogp_site_url = "https://canonical-craft-grammar.readthedocs-hosted.com/"
+ogp_site_url = "https://documentation.ubuntu.com/craft-grammar/"
 
 # Preview name of the documentation website
 ogp_site_name = project
 
 # Preview image URL
-#
-# TODO: To customise the preview image, update as needed.
 ogp_image = "https://assets.ubuntu.com/v1/cc828679-docs_illustration.svg"
 
 # Product favicon; shown in bookmarks, browser tabs, etc.
@@ -53,12 +55,15 @@ html_context = {
     "product_page": "github.com/canonical/craft-grammar",
     # Product tag image; the orange part of your logo, shown in the page header
     # "product_tag": "_static/tag.png",
+    # Your Discourse instance URL
     "discourse": "",
     # Your Mattermost channel URL
     "mattermost": "https://chat.canonical.com/canonical/channels/documentation",
     # Your Matrix channel URL
     "matrix": "https://matrix.to/#/#starcraft-development:ubuntu.com",
-    # Your documentation GitHub repository URL
+    # Your documentation GitHub repository URL. If set, links for viewing the
+    # documentation source files and creating GitHub issues are added at the bottom of
+    # each page.
     "github_url": "https://github.com/canonical/craft-grammar",
     # Docs branch in the repo; used in links for viewing the source files
     "repo_default_branch": "main",
@@ -68,11 +73,17 @@ html_context = {
     "display_contributors": False,
     # Required for feedback button
     "github_issues": "enabled",
+    # Passes the top-level 'author' value to the theme
+    "author": author,
+    # Documentation license information
+    "license": {
+        # For the name, we recommend using the standard shorthand identifier from
+        # https://spdx.org/licenses
+        "name": "LGPL-3.0",
+        "url": "https://github.com/canonical/craft-grammar/blob/main/LICENSE",
+    },
 }
 
-#html_extra_path = []
-
-# Enable the edit button on pages
 html_theme_options = {
   "source_edit_link": "https://github.com/canonical/craft-grammar",
 }
@@ -94,7 +105,7 @@ sitemap_url_scheme = "{link}"
 # Include `lastmod` dates in the sitemap:
 # sitemap_show_lastmod = True
 
-# Exclude generated pages from the sitemap:
+# Pages excluded from the sitemap:
 sitemap_excludes = [
     "404/",
     "genindex/",
@@ -106,7 +117,7 @@ sitemap_excludes = [
 # Template and asset locations #
 ################################
 
-html_static_path = ["_static"]
+# html_static_path = ["_static"]
 templates_path = ["_templates"]
 
 
@@ -114,8 +125,33 @@ templates_path = ["_templates"]
 # Redirects #
 #############
 
+# Add redirects to the 'redirects.txt' file
+# https://sphinxext-rediraffe.readthedocs.io/en/latest/
+
+# To set up redirects in the Read the Docs project dashboard:
+# https://docs.readthedocs.io/en/stable/guides/redirects.html
+
 rediraffe_redirects = "redirects.txt"
 
+# Strips '/index.html' from destination URLs when building with 'dirhtml'
+rediraffe_dir_only = True
+
+############################
+# sphinx-llm configuration #
+############################
+
+# This description is included in llms.txt to provide some initial context for your
+# product docs.
+llms_txt_description = textwrap.dedent(
+    """\
+    This is the documentation for Craft Grammar, a Python library that supports
+    advanced grammar declarations in project files for craft apps.
+    """
+)
+
+# The base URL for references built by sphinx-markdown-builder.
+if os.environ.get("READTHEDOCS"):
+    markdown_http_base = html_baseurl
 
 ###########################
 # Link checker exceptions #
@@ -140,6 +176,9 @@ linkcheck_anchors_ignore = []
 # Give linkcheck multiple tries on failure
 linkcheck_retries = 20
 
+# Report timeouts as 'timeout' instead of 'broken'
+linkcheck_report_timeouts_as_broken = False
+
 
 ########################
 # Configuration extras #
@@ -147,17 +186,18 @@ linkcheck_retries = 20
 
 # Custom Sphinx extensions; see
 # https://www.sphinx-doc.org/en/master/usage/extensions/index.html
-# NOTE: The canonical_sphinx extension is required for the starter pack.
 extensions = [
     "canonical_sphinx",
     "notfound.extension",
     "sphinx_design",
+    "sphinx_rerediraffe",
     # "sphinx_tabs.tabs",
     # "sphinxcontrib.jquery"
     "sphinxext.opengraph",
     # "sphinx_config_options",
     # "sphinx_contributor_listing",
     # "sphinx_filtered_toctree",
+    "sphinx_llm.txt",
     "sphinx_related_links",
     "sphinx_roles",
     "sphinx_terminal",
@@ -168,7 +208,6 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx_sitemap",
     # Custom Craft extensions
-    "sphinxext.rediraffe",
     "sphinx.ext.autodoc",
     "sphinx.ext.doctest",
     "sphinx.ext.viewcode",
@@ -181,17 +220,17 @@ exclude_patterns = [
     "reuse",
 ]
 
-# Adds custom CSS files, located under html_static_path
+# Adds custom CSS files, located remotely or in 'html_static_path'.
 html_css_files = [
-    "css/cookie-banner.css"
+    "css/cookie-banner.css",
 ]
 
-# Adds custom JavaScript files, located under html_static_path
+# Adds custom JavaScript files, located remotely or in 'html_static_path'.
 html_js_files = [
     "js/bundle.js",
 ]
 
-# Specifies a reST snippet to be appended to each .rst file
+# Appends extra markup to the end of every document written in reST
 rst_epilog = """
 """
 
@@ -215,10 +254,6 @@ rst_prolog = """
 .. role:: vale-ignore
     :class: vale-ignore
 """
-
-# Workaround for https://github.com/canonical/canonical-sphinx/issues/34
-if "discourse_prefix" not in html_context and "discourse" in html_context:
-    html_context["discourse_prefix"] = f"{html_context['discourse']}/t/"
 
 # Add configuration for intersphinx mapping
 intersphinx_mapping = {

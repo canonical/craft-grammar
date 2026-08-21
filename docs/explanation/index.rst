@@ -1,3 +1,6 @@
+.. meta::
+    :description: The explanatory documentation for Craft Grammar. These explanations aid in understanding the concepts and relationships of Craft Grammar as a complete system.
+
 .. _explanation:
 
 Explanation
