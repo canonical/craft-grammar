@@ -78,9 +78,9 @@ def process_data(
                 if not processed_grammar:
                     processed_grammar = None
             elif key not in NON_SCALAR_VALUES:
-                processed_grammar = processed_grammar[0] if processed_grammar else None  # type: ignore[assignment]
+                processed_grammar = processed_grammar[0] if processed_grammar else None
         elif key not in NON_SCALAR_VALUES or key in DICT_ONLY_VALUES:
-            processed_grammar = processed_grammar[0] if processed_grammar else None  # type: ignore[assignment]
+            processed_grammar = processed_grammar[0] if processed_grammar else None
 
         data[key] = processed_grammar
 
