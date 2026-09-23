@@ -82,15 +82,12 @@ class GrammarMyModel(BaseModel):
 """
 
 if sys.version_info >= (3, 14):
-    EXPECTED_GRAMMAR_MODEL = (
-        EXPECTED_GRAMMAR_MODEL.replace(
-            "optional_str_value: Optional[Grammar[str]]",
-            "optional_str_value: Grammar[str] | None",
-        )
-        .replace(
-            "union_value: Grammar[Union[str, int, None]]",
-            "union_value: Grammar[str] | Grammar[int] | None",
-        )
+    EXPECTED_GRAMMAR_MODEL = EXPECTED_GRAMMAR_MODEL.replace(
+        "optional_str_value: Optional[Grammar[str]]",
+        "optional_str_value: Grammar[str] | None",
+    ).replace(
+        "union_value: Grammar[Union[str, int, None]]",
+        "union_value: Grammar[str] | Grammar[int] | None",
     )
 
 
