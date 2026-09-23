@@ -26,8 +26,8 @@ jobs:
       - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: filter
         with:
-          # Combine multiple negation checks into a union (¬A ∧ ¬B ∧ ¬C), because individual entries are checked independently (A ∨ B ∨ C).
-          # If we ever need to filter only for docs, glob 'docs/**/*' and '**/*.md'
+          # Combine multiple negation checks into a union (¬A ∧ ¬B ∧ ¬C), because individual entries are checked independently\n# (A ∨ B ∨ C).
+          # If we ever need to filter only for docs, glob 'docs/**/*' and\n# '**/*.md'
           filters: |
             source-files:
               - '!({docs/**,*.md,**/*.md,.readthedocs.yaml})'
@@ -42,7 +42,7 @@ jobs:
     with:
       source-files: ${{ needs.filter.outputs.source-files }}
       lowest-python-version: "3.10"
-      fast-test-platforms: '["ubuntu-22.04", "ubuntu-24.04", "ubuntu-24.04-arm", "self-hosted-linux-amd64-resolute-large"]'
+      fast-test-platforms: '[\n  \"ubuntu-22.04\",\n  \"ubuntu-24.04\",\n  \"ubuntu-24.04-arm\",\n  \"ubuntu-26.04\",\n  \"ubuntu-26.04-arm\"]'
       fast-test-python-versions: '["3.10", "3.12", "3.14"]'
-      slow-test-platforms: '["ubuntu-22.04", "ubuntu-24.04", "ubuntu-24.04-arm", "self-hosted-linux-amd64-resolute-large"]'
+      slow-test-platforms: '[\n  \"ubuntu-22.04\",\n  \"ubuntu-24.04\",\n  \"ubuntu-24.04-arm\",\n  \"ubuntu-26.04\",\n  \"ubuntu-26.04-arm\"]'
       slow-test-python-versions: '["3.10", "3.12", "3.14"]'
