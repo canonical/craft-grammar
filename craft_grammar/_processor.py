@@ -60,11 +60,11 @@ class GrammarProcessor(BaseProcessor):  # pylint: disable=too-few-public-methods
     @override
     def __init__(
         self,
-        *,
-        checker: Callable[[Any], bool] = lambda _: True,
         arch: str,
         target_arch: str | None = None,
         platforms: Collection[str] | None = None,
+        *,
+        checker: Callable[[Any], bool] = lambda _: True,
         transformer: Callable[[list[Statement], str, str], str] | None = None,
         valid_platforms: Collection[str] | None = None,
         valid_architectures: Collection[str] | None = None,
