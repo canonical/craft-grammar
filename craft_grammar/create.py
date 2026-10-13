@@ -67,9 +67,8 @@ def create_grammar_model(model_class: type[BaseModel]) -> str:
         attr_decl = f"{new_name}: {grammar_type}"
 
         if not attr_field.is_required():
-            default_factory = attr_field.default_factory
-            if default_factory is not None:
-                default = repr(default_factory())
+            if attr_field.default_factory is not None:
+                default = repr(attr_field.get_default(call_default_factory=True))
             else:
                 default = repr(attr_field.default)
             # repr(x) uses single quotes for strings; replace them with double
