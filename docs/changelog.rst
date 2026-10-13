@@ -16,13 +16,6 @@ Changelog
 
   For a complete list of commits, check out the `X.Y.Z`_ release on GitHub.
 
-Unreleased
-----------
-
-Bug fixes:
-
-- Fix type checking of default factories when creating grammar models.
-
 .. _release 2.3.0:
 
 2.3.0 (2025-09-19)

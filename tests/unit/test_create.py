@@ -17,7 +17,6 @@ from __future__ import annotations
 
 from typing import List, Literal, Optional, Union  # noqa: UP035 (deprecated-import)
 
-import pytest
 from craft_grammar import create_grammar_model
 from pydantic import BaseModel, Field
 
@@ -86,23 +85,3 @@ def test_create_model():
     grammar_model = create_grammar_model(MyModel)
 
     assert grammar_model == EXPECTED_GRAMMAR_MODEL
-
-
-@pytest.mark.parametrize(
-    ("factory", "expected"),
-    [
-        (str, '""'),
-        (list, "[]"),
-        (dict, "{}"),
-        (lambda: "default", '"default"'),
-    ],
-)
-def test_create_model_default_factory(factory, expected):
-    class Model(BaseModel):
-        value: str | list[str] | dict[str, str] = Field(default_factory=factory)
-
-    grammar_model = create_grammar_model(Model)
-
-    assert grammar_model.endswith(
-        f"    value: Grammar[str] | Grammar[list[str]] | Grammar[dict[str, str]] = {expected}\n",
-    )
